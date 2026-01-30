@@ -1,0 +1,561 @@
+{
+  "name": "AI-Powered FSM Email Intake",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Incoming email:\n\nFrom: {{ $json.From }}\nSubject: {{ $json.Subject }}\n\nBody:\n{{ $json.snippet }}\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an FSM (Field Service Management) intake agent for an elevator services company.\n\nYou receive raw customer emails.\n\nYour responsibilities:\n1. Classify the email\n2. Decide whether a reply is required\n3. Extract structured service request data when applicable\n\nCLASSIFICATIONS:\n- JUNK → spam, marketing, newsletters, irrelevant messages\n- INCOMPLETE → service-related but missing key details\n- VALID → clear service request with sufficient information\n\nDECISION RULES:\n- JUNK → do NOT reply\n- INCOMPLETE → reply requesting missing details\n- VALID → do NOT ask questions, proceed to logging\n\nFOR INCOMPLETE EMAILS:\nPolitely ask ONLY for missing information such as:\n- Service type\n- Address\n- Elevator brand\n- Urgency\n\nFOR VALID EMAILS:\nExtract structured data from the email.\n\nIMPORTANT RULES:\n- If classification = JUNK → shouldReply = false AND extractedQuery = null\n- If classification = INCOMPLETE → shouldReply = true\n- If classification = VALID → shouldReply = false\n- Never hallucinate missing information\n- Leave unknown fields as empty strings\n- Do NOT include explanations or extra text\n\nRETURN OUTPUT IN JSON ONLY using this EXACT structure:\n\n{\n  \"classification\": \"JUNK | INCOMPLETE | VALID\",\n  \"shouldReply\": true | false,\n  \"replyMessage\": \"\",\n  \"extractedQuery\": {\n    \"customerName\": \"\",\n    \"customerEmail\": \"\",\n    \"serviceType\": \"\",\n    \"elevatorBrand\": \"\",\n    \"buildingType\": \"\",\n    \"address\": \"\",\n    \"urgency\": \"\",\n    \"description\": \"\"\n  }\n}\n"
+        }
+      },
+      "id": "28ced9e2-6d2c-4cd3-be1a-9e3e06e74e0f",
+      "name": "FSM Email Intake Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        5824
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "153e524d-a37c-48c5-bcf9-d25f2ce89e23",
+      "name": "OpenAI Model - FSM Intake",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        424,
+        6048
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "PWBzyLQJa7YNcOBo",
+          "name": "OpenAi account aqib"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"classification\": \"VALID\",\n  \"shouldReply\": false,\n  \"replyMessage\": \"\",\n  \"extractedQuery\": {\n    \"customerName\": \"John Smith\",\n    \"customerEmail\": \"john@example.com\",\n    \"serviceType\": \"Maintenance\",\n    \"elevatorBrand\": \"Otis\",\n    \"buildingType\": \"Commercial\",\n    \"address\": \"123 Main St\",\n    \"urgency\": \"Normal\",\n    \"description\": \"Annual maintenance check\"\n  }\n}\n"
+      },
+      "id": "8b50a47a-9d58-479a-8567-710a021d6097",
+      "name": "Email Classification Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        552,
+        6048
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "condition-1",
+                    "leftValue": "={{ $json.output.classification }}",
+                    "rightValue": "JUNK",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "condition-2",
+                    "leftValue": "={{ $json.output.classification }}",
+                    "rightValue": "INCOMPLETE",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "condition-3",
+                    "leftValue": "={{ $json.output.classification }}",
+                    "rightValue": "VALID",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f9dc6781-944e-4d73-a104-5384aae6ddc7",
+      "name": "Route by Classification",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        768,
+        6000
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "id": "6bc81384-52a3-4bb5-b526-8cf69d691103",
+      "name": "Reply - Request Missing Info",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1344,
+        6112
+      ],
+      "webhookId": "9ae817a8-80b0-4e23-9eb0-a0536df497b2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pKSZJXcTBr9r2Wu7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "a8538eb1-1029-4e56-9e16-a35e0a6d811b",
+      "name": "Junk - No Action",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        5728
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "customerName",
+              "value": "={{ $json.output.extractedQuery.customerName }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "customerEmail",
+              "value": "={{ $json.output.extractedQuery.customerEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "serviceType",
+              "value": "={{ $json.output.extractedQuery.serviceType }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "elevatorBrand",
+              "value": "={{ $json.output.extractedQuery.elevatorBrand }}",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "buildingType",
+              "value": "={{ $json.output.extractedQuery.buildingType }}",
+              "type": "string"
+            },
+            {
+              "id": "id-6",
+              "name": "address",
+              "value": "={{ $json.output.extractedQuery.address }}",
+              "type": "string"
+            },
+            {
+              "id": "id-7",
+              "name": "urgency",
+              "value": "={{ $json.output.extractedQuery.urgency }}",
+              "type": "string"
+            },
+            {
+              "id": "id-9",
+              "name": "description",
+              "value": "={{ $json.output.extractedQuery.description }}",
+              "type": "string"
+            },
+            {
+              "id": "id-10",
+              "name": "emailId",
+              "value": "={{ $('Gmail Trigger').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "id-11",
+              "name": "threadId",
+              "value": "={{ $('Gmail Trigger').item.json.threadId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a3cfc3c-8385-4549-9041-afa618feba41",
+      "name": "Prepare Valid Request Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        6304
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "test-email-classification",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e4097819-38c6-401d-b1fd-df6b68fdec02",
+      "name": "Webhook - Test Email Classification",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        192,
+        5728
+      ],
+      "webhookId": "0bf96e5b-71c8-43ca-9a08-89f7c4a61cc0"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "de03b35c-301f-4b2a-aa32-7221e5594af9",
+      "name": "Return Classification Result",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1056,
+        5920
+      ]
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        5920
+      ],
+      "id": "224f6301-197d-4864-bbb9-5a5c694d5a76",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "pKSZJXcTBr9r2Wu7",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Incoming email:\n\nFrom: {{ $('Gmail Trigger').item.json.From }}\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\n\nBody:{{ $('Gmail Trigger').item.json.snippet }}\n\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an FSM Customer Response Agent.\n\nInput:\n- Partial inquiry\n- List of missing required fields\n\nYour task:\nWrite a professional, concise email asking the sender to provide the missing details.\n\nTone:\n- Polite\n- Helpful\n- Professional\n- Not robotic\n\nRules:\n- Clearly list missing items in bullet points.\n- Do NOT mention internal systems or AI.\n- Do NOT ask for information already provided.\n- End with a friendly call-to-action.\n- Output ONLY the email body text (no subject line, no \"Subject:\" prefix)\n- Use simple HTML formatting for structure\n\nEmail Structure:\n1. Greeting\n2. Acknowledge their request\n3. List missing details in bullet points\n4. Explain next steps once received\n5. Professional sign-off\n\nIMPORTANT: Return ONLY the formatted email body, nothing else."
+        }
+      },
+      "id": "bb10c765-c27a-4f13-8f01-ff65be9ff054",
+      "name": "Missing data request email",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        992,
+        6112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "<__PLACEHOLDER_VALUE__Website webhook URL__>",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "6cd50467-e68e-4cea-9606-56faa5840ab2",
+      "name": "Send to Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1056,
+        5536
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "emailData",
+              "value": "={{ $('Gmail Trigger').item.json }}",
+              "type": "object"
+            },
+            {
+              "id": "id-2",
+              "name": "classification",
+              "value": "={{ $json.output.classification }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "shouldReply",
+              "value": "={{ $json.output.shouldReply }}",
+              "type": "boolean"
+            },
+            {
+              "id": "id-4",
+              "name": "extractedQuery",
+              "value": "={{ $json.output.extractedQuery }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "36359655-9fe3-43fb-8cd4-a03562a4cef4",
+      "name": "Merge Email and Classification",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        5536
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "<__PLACEHOLDER_VALUE__Website webhook URL for valid requests__>",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "aced5e36-d022-4395-818f-576dfe1eecab",
+      "name": "Send Valid Request to Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1344,
+        6304
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Model - FSM Intake": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "FSM Email Intake Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Missing data request email",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Classification Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "FSM Email Intake Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FSM Email Intake Agent": {
+      "main": [
+        [
+          {
+            "node": "Route by Classification",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Email and Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Classification": {
+      "main": [
+        [
+          {
+            "node": "Junk - No Action",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Return Classification Result",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return Classification Result",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Missing data request email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Valid Request Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Return Classification Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Test Email Classification": {
+      "main": [
+        [
+          {
+            "node": "FSM Email Intake Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "FSM Email Intake Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Missing data request email": {
+      "main": [
+        [
+          {
+            "node": "Reply - Request Missing Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Email and Classification": {
+      "main": [
+        [
+          {
+            "node": "Send to Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Valid Request Data": {
+      "main": [
+        [
+          {
+            "node": "Send Valid Request to Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ad74cd70-0d62-443d-8109-7b8e2e61e852",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "ec1f7c6face26bf6b2ece7671d0f3816b3ac244762307e865d9e49d7421aa88d"
+  },
+  "id": "wfnOdqzwFZIOqZT0",
+  "tags": []
+}
