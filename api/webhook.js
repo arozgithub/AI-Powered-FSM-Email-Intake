@@ -47,6 +47,13 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
+  // Log request details
+  console.log('📥 Webhook request:', {
+    method: req.method,
+    headers: req.headers,
+    body: req.body
+  });
+
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -86,6 +93,7 @@ module.exports = async function handler(req, res) {
       });
     }
   } else {
-    res.status(405).json({ error: 'Method not allowed' });
+    console.log('❌ Method not allowed:', req.method);
+    res.status(405).json({ error: 'Method not allowed', receivedMethod: req.method });
   }
 }
