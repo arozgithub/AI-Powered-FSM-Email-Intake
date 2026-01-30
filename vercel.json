@@ -22,10 +22,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "VITE_N8N_WEBHOOK_URL": "@n8n_webhook_url",
-    "VITE_EMAIL_API_URL": "",
-    "VITE_USE_MOCK": "false"
-  }
+  ]
 }
