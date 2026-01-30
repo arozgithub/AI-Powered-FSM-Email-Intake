@@ -1,7 +1,6 @@
 // Vercel Serverless Function for fetching emails
-// Note: In production, use Vercel KV, Redis, or external database
-// This in-memory storage will reset on each deployment
-let emails = [];
+// Import shared storage module
+import { getEmails } from './_storage.js';
 
 export default function handler(req, res) {
   // Enable CORS
@@ -16,6 +15,7 @@ export default function handler(req, res) {
   }
 
   if (req.method === 'GET') {
+    const emails = getEmails();
     console.log(`📬 Fetching ${emails.length} emails for React app`);
     res.status(200).json({ emails });
   } else {

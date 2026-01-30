@@ -1,6 +1,6 @@
 // Vercel Serverless Function for receiving emails from n8n
-// In-memory storage (use Vercel KV or external DB for production)
-let emails = [];
+// Import shared storage module
+import { addEmail, updateEmail, getEmails } from './_storage.js';
 
 // Helper function to transform n8n data
 function transformN8nEmail(n8nData) {
@@ -62,18 +62,15 @@ export default function handler(req, res) {
       const transformedEmail = transformN8nEmail(req.body);
       
       // Check if email already exists
-      const existingIndex = emails.findIndex(e => e.id === transformedEmail.id);
+      const existingEmails = getEmails();
+      const existingIndex = existingEmails.findIndex(e => e.id === transformedEmail.id);
+      
       if (existingIndex >= 0) {
-        emails[existingIndex] = transformedEmail;
+        updateEmail(transformedEmail);
         console.log('✅ Updated existing email:', transformedEmail.id);
       } else {
-        emails.unshift(transformedEmail);
+        addEmail(transformedEmail);
         console.log('✅ Added new email:', transformedEmail.id);
-      }
-      
-      // Keep only last 100 emails
-      if (emails.length > 100) {
-        emails = emails.slice(0, 100);
       }
       
       res.status(200).json({ 
