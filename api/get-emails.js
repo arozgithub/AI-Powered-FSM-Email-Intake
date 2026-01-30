@@ -1,8 +1,8 @@
 // Vercel Serverless Function for fetching emails
 // Import shared storage module
-import { getEmails } from './_storage.js';
+const { getEmails } = require('./_storage.js');
 
-export default function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');

@@ -1,6 +1,6 @@
 // Vercel Serverless Function for receiving emails from n8n
 // Import shared storage module
-import { addEmail, updateEmail, getEmails } from './_storage.js';
+const { addEmail, updateEmail, getEmails } = require('./_storage.js');
 
 // Helper function to transform n8n data
 function transformN8nEmail(n8nData) {
@@ -40,7 +40,7 @@ function transformN8nEmail(n8nData) {
   };
 }
 
-export default function handler(req, res) {
+module.exports = async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');

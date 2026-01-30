@@ -4,11 +4,11 @@
 
 let emails = [];
 
-export function getEmails() {
+function getEmails() {
   return emails;
 }
 
-export function addEmail(email) {
+function addEmail(email) {
   emails.unshift(email);
   
   // Keep only last 100 emails
@@ -19,7 +19,7 @@ export function addEmail(email) {
   return email;
 }
 
-export function updateEmail(email) {
+function updateEmail(email) {
   const index = emails.findIndex(e => e.id === email.id);
   if (index >= 0) {
     emails[index] = email;
@@ -29,6 +29,13 @@ export function updateEmail(email) {
   return email;
 }
 
-export function clearEmails() {
+function clearEmails() {
   emails = [];
 }
+
+module.exports = {
+  getEmails,
+  addEmail,
+  updateEmail,
+  clearEmails
+};
