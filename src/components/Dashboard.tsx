@@ -135,29 +135,37 @@ export function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="flex gap-4 mb-8 justify-start">
-          <div className="bg-white rounded-lg shadow-md p-4 w-40 h-40 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
-            <CheckCircle2 className="w-8 h-8 text-green-500 mb-2" />
-            <p className="text-xs text-gray-600 mb-1">Total Queries</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+        <div className="flex gap-6 mb-8 justify-start">
+          <div className="bg-gradient-to-br from-white to-green-50 rounded-xl shadow-lg p-5 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border border-green-100 hover:scale-105">
+            <div className="bg-green-100 p-3 rounded-full mb-3">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Total Queries</p>
+            <p className="text-4xl font-bold text-gray-900">{stats.total}</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-4 w-40 h-40 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
-            <AlertCircle className="w-8 h-8 text-red-500 mb-2" />
-            <p className="text-xs text-gray-600 mb-1">Urgent</p>
-            <p className="text-3xl font-bold text-red-600">{stats.urgent}</p>
+          <div className="bg-gradient-to-br from-white to-red-50 rounded-xl shadow-lg p-5 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border border-red-100 hover:scale-105">
+            <div className="bg-red-100 p-3 rounded-full mb-3">
+              <AlertCircle className="w-8 h-8 text-red-600" />
+            </div>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Urgent</p>
+            <p className="text-4xl font-bold text-red-600">{stats.urgent}</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-4 w-40 h-40 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
-            <Wrench className="w-8 h-8 text-blue-500 mb-2" />
-            <p className="text-xs text-gray-600 mb-1">Maintenance</p>
-            <p className="text-3xl font-bold text-blue-600">{stats.maintenance}</p>
+          <div className="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg p-5 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border border-blue-100 hover:scale-105">
+            <div className="bg-blue-100 p-3 rounded-full mb-3">
+              <Wrench className="w-8 h-8 text-blue-600" />
+            </div>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Maintenance</p>
+            <p className="text-4xl font-bold text-blue-600">{stats.maintenance}</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-4 w-40 h-40 flex flex-col items-center justify-center text-center hover:shadow-lg transition-shadow">
-            <Clock className="w-8 h-8 text-orange-500 mb-2" />
-            <p className="text-xs text-gray-600 mb-1">Repairs</p>
-            <p className="text-3xl font-bold text-orange-600">{stats.repair}</p>
+          <div className="bg-gradient-to-br from-white to-orange-50 rounded-xl shadow-lg p-5 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border border-orange-100 hover:scale-105">
+            <div className="bg-orange-100 p-3 rounded-full mb-3">
+              <Clock className="w-8 h-8 text-orange-600" />
+            </div>
+            <p className="text-xs font-semibold text-gray-600 mb-2">Repairs</p>
+            <p className="text-4xl font-bold text-orange-600">{stats.repair}</p>
           </div>
         </div>
 
