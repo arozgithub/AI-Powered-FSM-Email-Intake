@@ -136,44 +136,44 @@ export function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="flex gap-6 mb-8 justify-start">
-          <Card className="bg-gradient-to-br from-white to-green-50 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border-green-100 hover:scale-105">
-            <CardContent className="p-0 flex flex-col items-center justify-center">
-              <div className="bg-green-100 p-3 rounded-full mb-3">
-                <CheckCircle2 className="w-8 h-8 text-green-600" />
+        <div className="grid gap-6 mb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 place-items-center">
+          <Card className="bg-gradient-to-br from-white to-green-50 w-56 h-56 text-center hover:shadow-xl transition-all duration-300 border-green-100 hover:scale-105">
+            <CardContent className="h-full flex flex-col items-center justify-center">
+              <div className="bg-green-100 p-4 rounded-full mb-4">
+                <CheckCircle2 className="w-10 h-10 text-green-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-600 mb-2">Total Queries</p>
-              <p className="text-4xl font-bold text-gray-900">{stats.total}</p>
+              <p className="text-sm font-semibold text-gray-600 mb-2">Total Queries</p>
+              <p className="text-5xl font-bold text-gray-900">{stats.total}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-white to-red-50 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border-red-100 hover:scale-105">
-            <CardContent className="p-0 flex flex-col items-center justify-center">
-              <div className="bg-red-100 p-3 rounded-full mb-3">
-                <AlertCircle className="w-8 h-8 text-red-600" />
+          <Card className="bg-gradient-to-br from-white to-red-50 w-56 h-56 text-center hover:shadow-xl transition-all duration-300 border-red-100 hover:scale-105">
+            <CardContent className="h-full flex flex-col items-center justify-center">
+              <div className="bg-red-100 p-4 rounded-full mb-4">
+                <AlertCircle className="w-10 h-10 text-red-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-600 mb-2">Urgent</p>
-              <p className="text-4xl font-bold text-red-600">{stats.urgent}</p>
+              <p className="text-sm font-semibold text-gray-600 mb-2">Urgent</p>
+              <p className="text-5xl font-bold text-red-600">{stats.urgent}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-white to-blue-50 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border-blue-100 hover:scale-105">
-            <CardContent className="p-0 flex flex-col items-center justify-center">
-              <div className="bg-blue-100 p-3 rounded-full mb-3">
-                <Wrench className="w-8 h-8 text-blue-600" />
+          <Card className="bg-gradient-to-br from-white to-blue-50 w-56 h-56 text-center hover:shadow-xl transition-all duration-300 border-blue-100 hover:scale-105">
+            <CardContent className="h-full flex flex-col items-center justify-center">
+              <div className="bg-blue-100 p-4 rounded-full mb-4">
+                <Wrench className="w-10 h-10 text-blue-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-600 mb-2">Maintenance</p>
-              <p className="text-4xl font-bold text-blue-600">{stats.maintenance}</p>
+              <p className="text-sm font-semibold text-gray-600 mb-2">Maintenance</p>
+              <p className="text-5xl font-bold text-blue-600">{stats.maintenance}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-white to-orange-50 w-44 h-44 flex flex-col items-center justify-center text-center hover:shadow-xl transition-all duration-300 border-orange-100 hover:scale-105">
-            <CardContent className="p-0 flex flex-col items-center justify-center">
-              <div className="bg-orange-100 p-3 rounded-full mb-3">
-                <Clock className="w-8 h-8 text-orange-600" />
+          <Card className="bg-gradient-to-br from-white to-orange-50 w-56 h-56 text-center hover:shadow-xl transition-all duration-300 border-orange-100 hover:scale-105">
+            <CardContent className="h-full flex flex-col items-center justify-center">
+              <div className="bg-orange-100 p-4 rounded-full mb-4">
+                <Clock className="w-10 h-10 text-orange-600" />
               </div>
-              <p className="text-xs font-semibold text-gray-600 mb-2">Repairs</p>
-              <p className="text-4xl font-bold text-orange-600">{stats.repair}</p>
+              <p className="text-sm font-semibold text-gray-600 mb-2">Repairs</p>
+              <p className="text-5xl font-bold text-orange-600">{stats.repair}</p>
             </CardContent>
           </Card>
         </div>
