@@ -2,7 +2,9 @@
 // ⚠️ WARNING: This will reset on every deployment and cold start!
 // For production, use Vercel KV, Redis, or a database
 
-let emails = [];
+// Use global object to persist across function calls in the same container
+global.emails = global.emails || [];
+let emails = global.emails;
 
 function getEmails() {
   return emails;
