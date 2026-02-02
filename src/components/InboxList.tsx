@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Mail, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Mail, Clock, CheckCircle2, XCircle, AlertCircle, Trash2 } from 'lucide-react';
 import type { Email } from '../App';
+
+const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
 interface InboxListProps {
   emails: Email[];
   selectedEmailId: string | null;
   onEmailSelect: (emailId: string) => void;
+  onEmailDeleted?: () => void;
 }
 
 const statusColors = {
@@ -17,8 +20,35 @@ const statusColors = {
 
 type InboxTab = 'Query Logged' | 'Waiting for Customer' | 'Junk';
 
-export function InboxList({ emails, selectedEmailId, onEmailSelect }: InboxListProps) {
+export function InboxList({ emails, selectedEmailId, onEmailSelect, onEmailDeleted }: InboxListProps) {
   const [activeTab, setActiveTab] = useState<InboxTab>('Query Logged');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (emailId: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent email selection when clicking delete
+    
+    if (!confirm('Are you sure you want to delete this email?')) {
+      return;
+    }
+
+    try {
+      setDeletingId(emailId);
+      const response = await fetch(`${API_BASE_URL}/api/delete-email?id=${emailId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete email');
+      }
+
+      onEmailDeleted?.(); // Refresh the email list
+    } catch (error) {
+      console.error('Failed to delete email:', error);
+      alert('Failed to delete email. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -120,9 +150,19 @@ export function InboxList({ emails, selectedEmailId, onEmailSelect }: InboxListP
                 </div>
                 <p className="text-sm text-slate-600 truncate">{email.senderEmail}</p>
               </div>
-              <div className="text-xs text-slate-500 flex-shrink-0 flex items-center gap-1">
-                <Clock className="size-3" />
-                {formatDateTime(email.receivedAt)}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="text-xs text-slate-500 flex items-center gap-1">
+                  <Clock className="size-3" />
+                  {formatDateTime(email.receivedAt)}
+                </div>
+                <button
+                  onClick={(e) => handleDelete(email.id, e)}
+                  disabled={deletingId === email.id}
+                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                  title="Delete email"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </div>
             </div>
             

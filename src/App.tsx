@@ -7,7 +7,9 @@ import { QueryLoggedModal } from './components/QueryLoggedModal';
 import { Dashboard } from './components/Dashboard';
 import type { ExtractedQuery } from './types/emailProcessing';
 import { fetchEmails } from './services/emailFetchService';
-import { RefreshCw, AlertCircle, LayoutDashboard, Mail } from 'lucide-react';
+import { RefreshCw, AlertCircle, LayoutDashboard, Mail, Trash2 } from 'lucide-react';
+
+const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
 export interface Email {
   id: string;
@@ -17,6 +19,10 @@ export interface Email {
   receivedAt: string;
   status: 'Unprocessed' | 'Junk' | 'Waiting for Customer' | 'Query Logged';
   body: string;
+  classification?: 'JUNK' | 'INCOMPLETE' | 'VALID';
+  extractedQuery?: ExtractedQuery;
+  shouldReply?: boolean;
+  replyMessage?: string;
 }
 
 export interface ExtractedFields extends ExtractedQuery {
@@ -49,6 +55,7 @@ export default function App() {
   const [showQueryModal, setShowQueryModal] = useState(false);
   const [isLoadingEmails, setIsLoadingEmails] = useState(false);
   const [emailsError, setEmailsError] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
 
   // Load emails on component mount
   useEffect(() => {
@@ -101,6 +108,30 @@ export default function App() {
     setShowQueryModal(false);
   };
 
+  const handleClearAll = async () => {
+    if (!confirm('Are you sure you want to delete all emails from inbox and dashboard? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setClearing(true);
+      const response = await fetch(`${API_BASE_URL}/api/clear-emails`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear emails');
+      }
+
+      await loadEmails(); // Reload to show empty state
+      setSelectedEmailId(null); // Clear selection
+    } catch (err) {
+      setEmailsError(err instanceof Error ? err.message : 'Failed to clear emails');
+    } finally {
+      setClearing(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
@@ -145,6 +176,16 @@ export default function App() {
               <RefreshCw className={`size-4 ${isLoadingEmails ? 'animate-spin' : ''}`} />
               {isLoadingEmails ? 'Refreshing...' : 'Refresh'}
             </button>
+
+            <button
+              onClick={handleClearAll}
+              disabled={clearing || emails.length === 0}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              title="Delete all emails"
+            >
+              <Trash2 className="size-4" />
+              {clearing ? 'Clearing...' : 'Clear All'}
+            </button>
           </div>
         </div>
       </header>
@@ -188,6 +229,7 @@ export default function App() {
               emails={emails} 
               selectedEmailId={selectedEmailId}
               onEmailSelect={handleEmailSelect}
+              onEmailDeleted={loadEmails}
             />
           )}
         </div>

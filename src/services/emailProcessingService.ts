@@ -156,7 +156,10 @@ FSM Service Desk`;
           classification: 'INCOMPLETE',
           shouldReply: true,
           replyMessage,
-          extractedQuery,
+          extractedQuery: {
+            ...extractedQuery,
+            assetBrand: extractedQuery.elevatorBrand
+          },
         });
       } else {
         resolve({
@@ -175,7 +178,10 @@ A service engineer will contact you shortly.
 
 Best regards,
 FSM Service Desk`,
-          extractedQuery,
+          extractedQuery: {
+            ...extractedQuery,
+            assetBrand: extractedQuery.elevatorBrand
+          },
         });
       }
     }, 1500); // Simulate API delay

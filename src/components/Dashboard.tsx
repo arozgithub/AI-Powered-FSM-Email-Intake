@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2 } from 'lucide-react';
 import type { Email } from '../App';
 import { fetchEmails } from '../services/emailFetchService';
+
+const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
 export function Dashboard() {
   const [emails, setEmails] = useState<Email[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [clearing, setClearing] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadEmails();
@@ -22,6 +26,52 @@ export function Dashboard() {
       setError(err instanceof Error ? err.message : 'Failed to load emails');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!confirm('Are you sure you want to delete all emails? This cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setClearing(true);
+      const response = await fetch(`${API_BASE_URL}/api/clear-emails`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to clear emails');
+      }
+
+      await loadEmails(); // Reload to show empty state
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to clear emails');
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  const handleDelete = async (emailId: string) => {
+    if (!confirm('Are you sure you want to delete this service request?')) {
+      return;
+    }
+
+    try {
+      setDeletingId(emailId);
+      const response = await fetch(`${API_BASE_URL}/api/delete-email?id=${emailId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete email');
+      }
+
+      await loadEmails(); // Refresh the list
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete email');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -68,9 +118,19 @@ export function Dashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests Dashboard</h1>
-          <p className="text-gray-600">Overview of all logged service queries</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests Dashboard</h1>
+            <p className="text-gray-600">Overview of all logged service queries</p>
+          </div>
+          <button
+            onClick={handleClearAll}
+            disabled={clearing || emails.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="size-4" />
+            {clearing ? 'Clearing...' : 'Clear All Data'}
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -150,6 +210,9 @@ export function Dashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Received
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -213,6 +276,16 @@ export function Dashboard() {
                           <Calendar className="w-4 h-4 mr-1" />
                           {new Date(email.receivedAt).toLocaleDateString()}
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                        <button
+                          onClick={() => handleDelete(email.id)}
+                          disabled={deletingId === email.id}
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50 p-2 hover:bg-red-50 rounded transition-colors"
+                          title="Delete this request"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   ))}
