@@ -1,4 +1,5 @@
-import { Mail, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { Mail, Clock, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import type { Email } from '../App';
 
 interface InboxListProps {
@@ -14,7 +15,11 @@ const statusColors = {
   'Query Logged': 'bg-green-100 text-green-800'
 };
 
+type InboxTab = 'Query Logged' | 'Waiting for Customer' | 'Junk';
+
 export function InboxList({ emails, selectedEmailId, onEmailSelect }: InboxListProps) {
+  const [activeTab, setActiveTab] = useState<InboxTab>('Query Logged');
+
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -26,15 +31,78 @@ export function InboxList({ emails, selectedEmailId, onEmailSelect }: InboxListP
     return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
   };
 
+  // Filter emails by active tab
+  const filteredEmails = emails.filter(email => email.status === activeTab);
+
+  // Count emails by status
+  const counts = {
+    'Query Logged': emails.filter(e => e.status === 'Query Logged').length,
+    'Waiting for Customer': emails.filter(e => e.status === 'Waiting for Customer').length,
+    'Junk': emails.filter(e => e.status === 'Junk').length,
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-slate-200">
-        <h2 className="font-medium text-slate-900">Inbox</h2>
-        <p className="text-sm text-slate-600">{emails.length} emails</p>
+        <h2 className="font-medium text-slate-900 mb-4">Inbox</h2>
+        
+        {/* Tabs */}
+        <div className="flex gap-1">
+          <button
+            onClick={() => setActiveTab('Query Logged')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === 'Query Logged'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <CheckCircle2 className="size-4" />
+            Query Logged
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
+              {counts['Query Logged']}
+            </span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('Waiting for Customer')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === 'Waiting for Customer'
+                ? 'bg-amber-100 text-amber-800'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <AlertCircle className="size-4" />
+            Waiting
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
+              {counts['Waiting for Customer']}
+            </span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab('Junk')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              activeTab === 'Junk'
+                ? 'bg-slate-100 text-slate-800'
+                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            <XCircle className="size-4" />
+            Junk
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
+              {counts['Junk']}
+            </span>
+          </button>
+        </div>
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {emails.map((email) => (
+        {filteredEmails.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-64 text-slate-400">
+            <Mail className="size-12 mb-2" />
+            <p className="text-sm">No {activeTab.toLowerCase()} emails</p>
+          </div>
+        ) : (
+          filteredEmails.map((email) => (
           <div
             key={email.id}
             onClick={() => onEmailSelect(email.id)}
@@ -66,7 +134,8 @@ export function InboxList({ emails, selectedEmailId, onEmailSelect }: InboxListP
               </span>
             </div>
           </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
