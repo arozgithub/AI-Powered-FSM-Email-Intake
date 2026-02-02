@@ -4,9 +4,10 @@ import { EmailDetail } from './components/EmailDetail';
 import { AIAgentPanel } from './components/AIAgentPanel';
 import { QueryConfirmation } from './components/QueryConfirmation';
 import { QueryLoggedModal } from './components/QueryLoggedModal';
+import { Dashboard } from './components/Dashboard';
 import type { ExtractedQuery } from './types/emailProcessing';
 import { fetchEmails } from './services/emailFetchService';
-import { RefreshCw, AlertCircle } from 'lucide-react';
+import { RefreshCw, AlertCircle, LayoutDashboard, Mail } from 'lucide-react';
 
 export interface Email {
   id: string;
@@ -40,6 +41,7 @@ export interface LoggedQuery {
 }
 
 export default function App() {
+  const [currentView, setCurrentView] = useState<'inbox' | 'dashboard'>('inbox');
   const [selectedEmailId, setSelectedEmailId] = useState<string | null>(null);
   const [emails, setEmails] = useState<Email[]>([]);
   const [showQueryConfirmation, setShowQueryConfirmation] = useState(false);
@@ -108,18 +110,49 @@ export default function App() {
             <h1 className="font-semibold text-slate-900">FSM Email Intake System</h1>
             <p className="text-sm text-slate-600">AI-Powered Service Desk</p>
           </div>
-          <button
-            onClick={loadEmails}
-            disabled={isLoadingEmails}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
-          >
-            <RefreshCw className={`size-4 ${isLoadingEmails ? 'animate-spin' : ''}`} />
-            {isLoadingEmails ? 'Refreshing...' : 'Refresh Emails'}
-          </button>
+          <div className="flex items-center gap-4">
+            {/* Navigation Tabs */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setCurrentView('inbox')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'inbox'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <Mail className="size-4" />
+                Inbox
+              </button>
+              <button
+                onClick={() => setCurrentView('dashboard')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                  currentView === 'dashboard'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                <LayoutDashboard className="size-4" />
+                Dashboard
+              </button>
+            </div>
+            
+            <button
+              onClick={loadEmails}
+              disabled={isLoadingEmails}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+            >
+              <RefreshCw className={`size-4 ${isLoadingEmails ? 'animate-spin' : ''}`} />
+              {isLoadingEmails ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
+      {currentView === 'dashboard' ? (
+        <Dashboard />
+      ) : (
       <div className="flex h-[calc(100vh-97px)]">
         {/* Inbox List - Left Panel */}
         <div className="w-96 border-r border-slate-200 bg-white overflow-y-auto">
@@ -194,6 +227,7 @@ export default function App() {
           </div>
         )}
       </div>
+      )}
 
       {/* Query Logged Modal */}
       {showQueryModal && loggedQuery && (
