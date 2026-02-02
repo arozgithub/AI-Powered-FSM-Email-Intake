@@ -64,9 +64,27 @@ async function clearEmails() {
   }
 }
 
+async function deleteEmail(emailId) {
+  try {
+    const emails = await getEmails();
+    const filteredEmails = emails.filter(e => e.id !== emailId);
+    
+    if (emails.length === filteredEmails.length) {
+      return null; // Email not found
+    }
+    
+    await redis.set(EMAILS_KEY, filteredEmails);
+    return emailId;
+  } catch (error) {
+    console.error('Error deleting email from Redis:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   getEmails,
   addEmail,
   updateEmail,
-  clearEmails
+  clearEmails,
+  deleteEmail
 };

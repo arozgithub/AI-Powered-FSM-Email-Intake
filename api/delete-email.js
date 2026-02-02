@@ -1,6 +1,4 @@
-const { getEmails, Redis } = require('./_storage');
-
-const redis = Redis.fromEnv();
+const { deleteEmail } = require('./_storage');
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -23,18 +21,12 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Email ID is required' });
     }
 
-    // Get current emails
-    const emails = await getEmails();
-    
-    // Filter out the email to delete
-    const updatedEmails = emails.filter(email => email.id !== id);
+    // Delete the email
+    const result = await deleteEmail(id);
 
-    if (emails.length === updatedEmails.length) {
+    if (!result) {
       return res.status(404).json({ error: 'Email not found' });
     }
-
-    // Save updated list
-    await redis.set('fsm-emails', JSON.stringify(updatedEmails));
 
     return res.status(200).json({ 
       success: true, 
