@@ -53,8 +53,8 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        664,
-        6032
+        688,
+        6192
       ]
     },
     {
@@ -137,7 +137,7 @@
       "typeVersion": 3.3,
       "position": [
         880,
-        6080
+        5872
       ]
     },
     {
@@ -315,7 +315,7 @@
         "text": "=Incoming email:\n\nFrom: {{ $('Gmail Trigger').item.json.From }}\nSubject: {{ $('Gmail Trigger').item.json.Subject }}\n\nBody:{{ $('Gmail Trigger').item.json.snippet }}\n\n",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "You are an FSM Customer Response Agent.\n\nInput:\n- Partial inquiry\n- List of missing required fields\n\nYour task:\nWrite a professional, concise email asking the sender to provide the missing details.\n\nTone:\n- Polite\n- Helpful\n- Professional\n- Not robotic\n\nRules:\n- Clearly list missing items in bullet points.\n- Do NOT mention internal systems or AI.\n- Do NOT ask for information already provided.\n- End with a friendly call-to-action.\n- Output ONLY the email body text (no subject line, no \"Subject:\" prefix)\n- Use simple HTML formatting for structure\n\nEmail Structure:\n1. Greeting\n2. Acknowledge their request\n3. List missing details in bullet points\n4. Explain next steps once received\n5. Professional sign-off\n\nIMPORTANT: Return ONLY the formatted email body, nothing else."
+          "systemMessage": "You are an FSM Customer Response Agent for an elevator services company.\n\nYou will receive:\n- The customer's partial inquiry\n- A structured object containing extracted details\n- Some required fields may be missing (empty strings)\n\nYour task:\nWrite a professional, polite email asking ONLY for the missing information.\n\nRules:\n- Do NOT mention AI, systems, workflows, or internal processing\n- Do NOT ask for information that is already provided\n- Only ask for fields that are empty\n- Keep the tone friendly, professional, and human\n- Be concise and clear\n- End with a friendly call-to-action\n- Output ONLY the email body (no subject line)\n- Use simple HTML formatting (<p>, <ul>, <li>)\n\nMissing fields to request:\n- Service Type (if empty)\n- Elevator Brand (if empty)\n- Urgency level (if empty)\n- Preferred visit date (if empty)\n\nCustomer details (may be partially filled):\nCustomer Name: {{ $json.extractedQuery.customerName }}\nService Type: {{ $json.extractedQuery.serviceType }}\nElevator Brand: {{ $json.extractedQuery.elevatorBrand }}\nUrgency: {{ $json.extractedQuery.urgency }}\nAddress: {{ $json.extractedQuery.address }}\nDescription: {{ $json.extractedQuery.description }}\n\nWrite the email now.\n"
         }
       },
       "id": "bb10c765-c27a-4f13-8f01-ff65be9ff054",
@@ -617,11 +617,11 @@
       ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "f3211252-07cd-4572-ab34-e034b5f917df",
+  "versionId": "48eed6a3-08c1-4a59-a530-d3cae47b76db",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "ec1f7c6face26bf6b2ece7671d0f3816b3ac244762307e865d9e49d7421aa88d"

@@ -62,7 +62,7 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
               customerName: extractedData.customerName,
               customerEmail: extractedData.customerEmail,
               serviceType: extractedData.serviceType,
-              elevatorBrand: extractedData.elevatorBrand,
+              assetBrand: extractedData.assetBrand,
               buildingType: extractedData.buildingType,
               address: extractedData.address,
               urgency: extractedData.urgency,
@@ -100,7 +100,7 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
     
     if (!data.serviceType) fields.push('Service Type');
     if (!data.address) fields.push('Building Address');
-    if (!data.elevatorBrand) fields.push('Elevator Brand');
+    if (!data.assetBrand) fields.push('Asset/Equipment Brand');
     if (!data.urgency) fields.push('Urgency/Timeframe');
     
     return fields;
@@ -152,7 +152,7 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
             <span className="text-sm font-medium text-slate-900">1. Analyzing email</span>
           </div>
           {step !== 'analyzing' && (
-            <p className="text-xs text-slate-600 ml-6">Email scanned for elevator service intent</p>
+            <p className="text-xs text-slate-600 ml-6">Email scanned for service request intent</p>
           )}
         </div>
 
@@ -174,7 +174,7 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
               <FieldDisplay label="Customer Name" value={processingResult.extractedQuery.customerName} required />
               <FieldDisplay label="Customer Email" value={processingResult.extractedQuery.customerEmail} required />
               <FieldDisplay label="Service Type" value={processingResult.extractedQuery.serviceType} required />
-              <FieldDisplay label="Elevator Brand" value={processingResult.extractedQuery.elevatorBrand} />
+              <FieldDisplay label="Asset/Equipment Brand" value={processingResult.extractedQuery.assetBrand} />
               <FieldDisplay label="Building Type" value={processingResult.extractedQuery.buildingType} />
               <FieldDisplay label="Address" value={processingResult.extractedQuery.address} required />
               <FieldDisplay label="Urgency" value={processingResult.extractedQuery.urgency} required />
@@ -204,7 +204,7 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
                     <XCircle className="size-5 text-slate-600" />
                     <span className="text-sm font-medium text-slate-900">Junk Email</span>
                   </div>
-                  <p className="text-xs text-slate-600 mb-2">No elevator service intent detected. This appears to be spam or irrelevant content.</p>
+                  <p className="text-xs text-slate-600 mb-2">No service intent detected. This appears to be spam or irrelevant content.</p>
                   <div className="bg-white rounded p-2 mt-2">
                     <p className="text-xs font-medium text-slate-900">Decision:</p>
                     <p className="text-xs text-slate-600">• Email marked as Junk</p>

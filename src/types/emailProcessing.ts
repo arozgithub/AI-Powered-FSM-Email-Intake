@@ -6,7 +6,7 @@ export interface ExtractedQuery {
   customerName: string;
   customerEmail: string;
   serviceType: string;
-  elevatorBrand: string;
+  assetBrand: string;
   buildingType: string;
   address: string;
   urgency: string;

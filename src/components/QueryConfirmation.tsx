@@ -93,9 +93,9 @@ export function QueryConfirmation({ query }: QueryConfirmationProps) {
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <Tag className="size-3 text-slate-400" />
-                  <span className="text-xs text-slate-600">Elevator Brand</span>
+                  <span className="text-xs text-slate-600">Asset/Equipment Brand</span>
                 </div>
-                <p className="text-sm text-slate-900">{query.elevatorBrand || 'Not specified'}</p>
+                <p className="text-sm text-slate-900">{query.assetBrand || 'Not specified'}</p>
               </div>
 
               <div>

@@ -142,7 +142,7 @@ export function Dashboard() {
                       Location
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Elevator Brand
+                      Asset/Equipment
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Urgency
@@ -194,7 +194,7 @@ export function Dashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm text-gray-900">
-                          {email.extractedQuery?.elevatorBrand || 'Not specified'}
+                          {email.extractedQuery?.assetBrand || 'Not specified'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
