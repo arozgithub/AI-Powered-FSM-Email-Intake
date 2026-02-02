@@ -116,134 +116,112 @@ export function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-2">
-              Service Requests Dashboard
-            </h1>
-            <p className="text-gray-600 text-lg">Overview of all logged service queries</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests Dashboard</h1>
+            <p className="text-gray-600">Overview of all logged service queries</p>
           </div>
           <button
             onClick={handleClearAll}
             disabled={clearing || emails.length === 0}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Trash2 className="size-5" />
+            <Trash2 className="size-4" />
             {clearing ? 'Clearing...' : 'Clear All Data'}
           </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Total Queries</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-                  {stats.total}
-                </p>
+                <p className="text-sm text-gray-600 mb-1">Total Queries</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl">
-                <CheckCircle2 className="w-8 h-8 text-blue-600" />
-              </div>
+              <CheckCircle2 className="w-12 h-12 text-green-500" />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Urgent</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-                  {stats.urgent}
-                </p>
+                <p className="text-sm text-gray-600 mb-1">Urgent</p>
+                <p className="text-3xl font-bold text-red-600">{stats.urgent}</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-red-50 to-orange-50 rounded-xl">
-                <AlertCircle className="w-8 h-8 text-red-600" />
-              </div>
+              <AlertCircle className="w-12 h-12 text-red-500" />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Maintenance</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
-                  {stats.maintenance}
-                </p>
+                <p className="text-sm text-gray-600 mb-1">Maintenance</p>
+                <p className="text-3xl font-bold text-blue-600">{stats.maintenance}</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl">
-                <Wrench className="w-8 h-8 text-indigo-600" />
-              </div>
+              <Wrench className="w-12 h-12 text-blue-500" />
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">Repairs</p>
-                <p className="text-4xl font-bold bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                  {stats.repair}
-                </p>
+                <p className="text-sm text-gray-600 mb-1">Repairs</p>
+                <p className="text-3xl font-bold text-orange-600">{stats.repair}</p>
               </div>
-              <div className="p-4 bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl">
-                <Clock className="w-8 h-8 text-orange-600" />
-              </div>
+              <Clock className="w-12 h-12 text-orange-500" />
             </div>
           </div>
         </div>
 
         {/* Queries Table */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-            <h2 className="text-xl font-bold text-gray-900">Service Requests</h2>
-            <p className="text-sm text-gray-600 mt-1">Click on any request to view details</p>
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900">Service Requests</h2>
           </div>
 
           {validQueries.length === 0 ? (
-            <div className="p-12 text-center">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-50 to-purple-50 mb-4">
-                <Mail className="w-10 h-10 text-blue-400" />
-              </div>
-              <p className="text-gray-500 text-lg">No service requests logged yet</p>
-              <p className="text-gray-400 text-sm mt-2">New requests will appear here automatically</p>
+            <div className="p-8 text-center text-gray-500">
+              <Mail className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p>No service requests logged yet</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Customer
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Service Type
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Asset/Equipment
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Urgency
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Received
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
+                <tbody className="bg-white divide-y divide-gray-200">
                   {validQueries.map((email) => (
                     <tr 
                       key={email.id} 
                       onClick={() => setSelectedEmail(email)}
-                      className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 cursor-pointer transition-all duration-200 group"
+                      className="hover:bg-gray-50 cursor-pointer transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -288,12 +266,12 @@ export function Dashboard() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-sm ${
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           email.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                            ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                            ? 'bg-red-100 text-red-800'
                             : email.extractedQuery?.urgency?.toLowerCase().includes('high')
-                            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                            : 'bg-gradient-to-r from-green-500 to-green-600 text-white'
+                            ? 'bg-orange-100 text-orange-800'
+                            : 'bg-green-100 text-green-800'
                         }`}>
                           {email.extractedQuery?.urgency || 'Normal'}
                         </span>
@@ -311,7 +289,7 @@ export function Dashboard() {
                             handleDelete(email.id);
                           }}
                           disabled={deletingId === email.id}
-                          className="text-red-600 hover:text-white hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 disabled:opacity-50 p-2.5 rounded-lg transition-all duration-200 hover:shadow-lg transform hover:scale-110"
+                          className="text-red-600 hover:text-red-900 disabled:opacity-50 p-2 hover:bg-red-50 rounded transition-colors"
                           title="Delete this request"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -326,10 +304,10 @@ export function Dashboard() {
         </div>
 
         {/* Refresh Button */}
-        <div className="mt-8 text-center">
+        <div className="mt-6 text-center">
           <button
             onClick={loadEmails}
-            className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold transform hover:-translate-y-0.5"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Refresh Data
           </button>
@@ -339,166 +317,160 @@ export function Dashboard() {
       {/* Service Request Detail Modal */}
       {selectedEmail && (
         <div 
-          className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedEmail(null)}
         >
           <div 
-            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all animate-slideUp"
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-5 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`p-3 rounded-xl bg-white/20 backdrop-blur-sm ${
+                <div className={`p-2 rounded-full ${
                   selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                    ? 'ring-2 ring-red-300'
-                    : 'ring-2 ring-white/30'
+                    ? 'bg-red-100'
+                    : 'bg-green-100'
                 }`}>
-                  <FileText className="w-6 h-6 text-white" />
+                  <FileText className={`w-5 h-5 ${
+                    selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                      ? 'text-red-600'
+                      : 'text-green-600'
+                  }`} />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">Service Request Details</h2>
-                  <p className="text-sm text-blue-100">
+                  <h2 className="text-xl font-semibold text-gray-900">Service Request Details</h2>
+                  <p className="text-sm text-gray-500">
                     {new Date(selectedEmail.receivedAt).toLocaleString()}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedEmail(null)}
-                className="p-2 hover:bg-white/20 rounded-xl transition-colors backdrop-blur-sm"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <X className="w-6 h-6 text-white" />
+                <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
 
             {/* Modal Content */}
-            <div className="p-6 space-y-6 bg-gradient-to-br from-gray-50 to-slate-50">
+            <div className="p-6 space-y-6">
               {/* Customer Information */}
-              <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg">
-                    <User className="w-4 h-4 text-blue-600" />
-                  </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <User className="w-4 h-4" />
                   Customer Information
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Name</p>
-                    <p className="text-sm font-bold text-gray-900">
-                      {selectedEmail.extractedQuery?.customerName || selectedEmail.senderName}
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Email</p>
-                    <p className="text-sm text-gray-900 break-all">
-                      {selectedEmail.extractedQuery?.customerEmail || selectedEmail.senderEmail}
-                    </p>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Name</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {selectedEmail.extractedQuery?.customerName || selectedEmail.senderName}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Email</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.customerEmail || selectedEmail.senderEmail}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Service Details */}
-              <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg">
-                    <Wrench className="w-4 h-4 text-indigo-600" />
-                  </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Wrench className="w-4 h-4" />
                   Service Details
                 </h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">Service Type</p>
-                    <p className="text-sm font-bold text-gray-900">
-                      {selectedEmail.extractedQuery?.serviceType || 'Not specified'}
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">Urgency</p>
-                    <span className={`px-3 py-1.5 inline-flex text-xs leading-5 font-bold rounded-full shadow-sm ${
-                      selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                        ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
-                        : selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('high')
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                        : 'bg-gradient-to-r from-green-500 to-green-600 text-white'
-                    }`}>
-                      {selectedEmail.extractedQuery?.urgency || 'Normal'}
-                    </span>
-                  </div>
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">Asset/Equipment Brand</p>
-                    <p className="text-sm text-gray-900">
-                      {selectedEmail.extractedQuery?.assetBrand || 'Not specified'}
-                    </p>
-                  </div>
-                  <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">Building Type</p>
-                    <p className="text-sm text-gray-900">
-                      {selectedEmail.extractedQuery?.buildingType || 'Not specified'}
-                    </p>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Service Type</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {selectedEmail.extractedQuery?.serviceType || 'Not specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Urgency</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                          ? 'bg-red-100 text-red-800'
+                          : selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('high')
+                          ? 'bg-orange-100 text-orange-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {selectedEmail.extractedQuery?.urgency || 'Normal'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Asset/Equipment Brand</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.assetBrand || 'Not specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Building Type</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.buildingType || 'Not specified'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Location */}
-              <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-                    <MapPin className="w-4 h-4 text-green-600" />
-                  </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
                   Location
                 </h3>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4">
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-900">
                     {selectedEmail.extractedQuery?.address || 'Not specified'}
                   </p>
                 </div>
               </div>
 
               {/* Description */}
-              <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg">
-                    <FileText className="w-4 h-4 text-purple-600" />
-                  </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
                   Issue Description
                 </h3>
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap leading-relaxed">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">
                     {selectedEmail.extractedQuery?.description || selectedEmail.body}
                   </p>
                 </div>
               </div>
 
               {/* Original Email */}
-              <div className="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-                <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <div className="p-2 bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg">
-                    <Mail className="w-4 h-4 text-amber-600" />
-                  </div>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
                   Original Email
                 </h3>
-                <div className="space-y-3">
-                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-1">Subject</p>
-                    <p className="text-sm font-bold text-gray-900">{selectedEmail.subject}</p>
-                  </div>
-                  <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-4">
-                    <p className="text-xs font-semibold text-gray-600 mb-2">Message</p>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed">
-                      {selectedEmail.body}
-                    </p>
-                  </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1">Subject</p>
+                  <p className="text-sm font-medium text-gray-900 mb-3">{selectedEmail.subject}</p>
+                  <p className="text-xs text-gray-500 mb-1">Message</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap max-h-40 overflow-y-auto">
+                    {selectedEmail.body}
+                  </p>
                 </div>
               </div>
 
               {/* Status Badge */}
-              <div className="flex items-center justify-between pt-4 border-t-2 border-gray-200">
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                 <div>
-                  <p className="text-xs font-semibold text-gray-600 mb-2">Status</p>
-                  <span className={`px-4 py-2 inline-flex text-sm leading-5 font-bold rounded-xl shadow-md ${
+                  <p className="text-xs text-gray-500 mb-1">Status</p>
+                  <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${
                     selectedEmail.status === 'Query Logged'
-                      ? 'bg-gradient-to-r from-green-500 to-green-600 text-white'
-                      : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-blue-100 text-blue-800'
                   }`}>
                     {selectedEmail.status}
                   </span>
@@ -510,7 +482,7 @@ export function Dashboard() {
                     setSelectedEmail(null);
                   }}
                   disabled={deletingId === selectedEmail.id}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 disabled:opacity-50 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold transform hover:-translate-y-0.5"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete Request
