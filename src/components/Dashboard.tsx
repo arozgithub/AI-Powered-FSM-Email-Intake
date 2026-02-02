@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2 } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2, X, Phone, FileText } from 'lucide-react';
 import type { Email } from '../App';
 import { fetchEmails } from '../services/emailFetchService';
 
@@ -11,6 +11,7 @@ export function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [clearing, setClearing] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
 
   useEffect(() => {
     loadEmails();
@@ -217,7 +218,11 @@ export function Dashboard() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {validQueries.map((email) => (
-                    <tr key={email.id} className="hover:bg-gray-50 cursor-pointer">
+                    <tr 
+                      key={email.id} 
+                      onClick={() => setSelectedEmail(email)}
+                      className="hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <User className="w-5 h-5 text-gray-400 mr-2" />
@@ -279,7 +284,10 @@ export function Dashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
                         <button
-                          onClick={() => handleDelete(email.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(email.id);
+                          }}
                           disabled={deletingId === email.id}
                           className="text-red-600 hover:text-red-900 disabled:opacity-50 p-2 hover:bg-red-50 rounded transition-colors"
                           title="Delete this request"
@@ -305,6 +313,185 @@ export function Dashboard() {
           </button>
         </div>
       </div>
+
+      {/* Service Request Detail Modal */}
+      {selectedEmail && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedEmail(null)}
+        >
+          <div 
+            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-full ${
+                  selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                    ? 'bg-red-100'
+                    : 'bg-green-100'
+                }`}>
+                  <FileText className={`w-5 h-5 ${
+                    selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                      ? 'text-red-600'
+                      : 'text-green-600'
+                  }`} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Service Request Details</h2>
+                  <p className="text-sm text-gray-500">
+                    {new Date(selectedEmail.receivedAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedEmail(null)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Customer Information */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Customer Information
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Name</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {selectedEmail.extractedQuery?.customerName || selectedEmail.senderName}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Email</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.customerEmail || selectedEmail.senderEmail}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Service Details */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Wrench className="w-4 h-4" />
+                  Service Details
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Service Type</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {selectedEmail.extractedQuery?.serviceType || 'Not specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Urgency</p>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                          ? 'bg-red-100 text-red-800'
+                          : selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('high')
+                          ? 'bg-orange-100 text-orange-800'
+                          : 'bg-green-100 text-green-800'
+                      }`}>
+                        {selectedEmail.extractedQuery?.urgency || 'Normal'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Asset/Equipment Brand</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.assetBrand || 'Not specified'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">Building Type</p>
+                      <p className="text-sm text-gray-900">
+                        {selectedEmail.extractedQuery?.buildingType || 'Not specified'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Location */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  Location
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-900">
+                    {selectedEmail.extractedQuery?.address || 'Not specified'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Issue Description
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                    {selectedEmail.extractedQuery?.description || selectedEmail.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Original Email */}
+              <div>
+                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
+                  <Mail className="w-4 h-4" />
+                  Original Email
+                </h3>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1">Subject</p>
+                  <p className="text-sm font-medium text-gray-900 mb-3">{selectedEmail.subject}</p>
+                  <p className="text-xs text-gray-500 mb-1">Message</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap max-h-40 overflow-y-auto">
+                    {selectedEmail.body}
+                  </p>
+                </div>
+              </div>
+
+              {/* Status Badge */}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Status</p>
+                  <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${
+                    selectedEmail.status === 'Query Logged'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-blue-100 text-blue-800'
+                  }`}>
+                    {selectedEmail.status}
+                  </span>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(selectedEmail.id);
+                    setSelectedEmail(null);
+                  }}
+                  disabled={deletingId === selectedEmail.id}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Request
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
