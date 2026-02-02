@@ -1,38 +1,67 @@
-// Shared in-memory storage for Vercel serverless functions
-// ⚠️ WARNING: This will reset on every deployment and cold start!
-// For production, use Vercel KV, Redis, or a database
+// Upstash Redis storage for Vercel serverless functions
+const { Redis } = require('@upstash/redis');
 
-// Use global object to persist across function calls in the same container
-global.emails = global.emails || [];
-let emails = global.emails;
+const redis = new Redis({
+  url: 'https://included-skink-37154.upstash.io',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || 'AZEiAAIncDE0YjI5ZmYzZmQzM2M0ZGNjOTkxN2Y5NjUyMGM4ZDgxZHAxMzcxNTQ'
+});
 
-function getEmails() {
-  return emails;
-}
+const EMAILS_KEY = 'fsm-emails';
 
-function addEmail(email) {
-  emails.unshift(email);
-  
-  // Keep only last 100 emails
-  if (emails.length > 100) {
-    emails = emails.slice(0, 100);
+async function getEmails() {
+  try {
+    const emails = await redis.get(EMAILS_KEY);
+    return emails || [];
+  } catch (error) {
+    console.error('Error getting emails from Redis:', error);
+    return [];
   }
-  
-  return email;
 }
 
-function updateEmail(email) {
-  const index = emails.findIndex(e => e.id === email.id);
-  if (index >= 0) {
-    emails[index] = email;
-  } else {
-    addEmail(email);
+async function addEmail(email) {
+  try {
+    const emails = await getEmails();
+    emails.unshift(email);
+    
+    // Keep only last 100 emails
+    if (emails.length > 100) {
+      emails.length = 100;
+    }
+    
+    await redis.set(EMAILS_KEY, emails);
+    return email;
+  } catch (error) {
+    console.error('Error adding email to Redis:', error);
+    throw error;
   }
-  return email;
 }
 
-function clearEmails() {
-  emails = [];
+async function updateEmail(email) {
+  try {
+    const emails = await getEmails();
+    const index = emails.findIndex(e => e.id === email.id);
+    
+    if (index >= 0) {
+      emails[index] = email;
+    } else {
+      emails.unshift(email);
+    }
+    
+    await redis.set(EMAILS_KEY, emails);
+    return email;
+  } catch (error) {
+    console.error('Error updating email in Redis:', error);
+    throw error;
+  }
+}
+
+async function clearEmails() {
+  try {
+    await redis.del(EMAILS_KEY);
+  } catch (error) {
+    console.error('Error clearing emails from Redis:', error);
+    throw error;
+  }
 }
 
 module.exports = {

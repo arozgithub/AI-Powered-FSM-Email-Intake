@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
-    const emails = getEmails();
+    const emails = await getEmails();
     console.log(`📬 Fetching ${emails.length} emails for React app`);
     res.status(200).json({ emails });
   } else {

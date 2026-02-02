@@ -69,14 +69,14 @@ module.exports = async function handler(req, res) {
       const transformedEmail = transformN8nEmail(req.body);
       
       // Check if email already exists
-      const existingEmails = getEmails();
+      const existingEmails = await getEmails();
       const existingIndex = existingEmails.findIndex(e => e.id === transformedEmail.id);
       
       if (existingIndex >= 0) {
-        updateEmail(transformedEmail);
+        await updateEmail(transformedEmail);
         console.log('✅ Updated existing email:', transformedEmail.id);
       } else {
-        addEmail(transformedEmail);
+        await addEmail(transformedEmail);
         console.log('✅ Added new email:', transformedEmail.id);
       }
       
