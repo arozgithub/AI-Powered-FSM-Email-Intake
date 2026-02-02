@@ -20,77 +20,72 @@ export function AIAgentPanel({ email, onStatusUpdate, onQueryLogged }: AIAgentPa
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Reset states when email changes
-    setStep('analyzing');
-    setClassification(null);
-    setProcessingResult(null);
-    setClarificationSent(false);
-    setError(null);
-
-    // Process email through the workflow
-    const processEmailWorkflow = async () => {
+    // Show processing animation but use n8n classification data
+    const showProcessingAnimation = async () => {
       try {
-        // Step 1: Analyzing
+        // Step 1: Analyzing (visual effect only)
         setStep('analyzing');
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Step 2: Extracting
+        // Step 2: Extracting (visual effect only)
         setStep('extracting');
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Call the email processing service
-        const result = await processEmail({
-          emailId: email.id,
-          senderName: email.senderName,
-          senderEmail: email.senderEmail,
-          subject: email.subject,
-          body: email.body,
-          receivedAt: email.receivedAt,
-        });
-
-        setProcessingResult(result);
-        
-        // Step 3: Classifying
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Step 3: Classifying (visual effect only)
         setStep('classifying');
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        setClassification(result.classification);
-        setStep('complete');
-
-        // Update email status based on classification
-        if (result.classification === 'JUNK') {
-          onStatusUpdate(email.id, 'Junk');
-        } else if (result.classification === 'INCOMPLETE') {
-          onStatusUpdate(email.id, 'Waiting for Customer');
-        } else if (result.classification === 'VALID') {
-          // Log the query
-          const queryId = `QRY-UK-${Math.floor(10000 + Math.random() * 90000)}`;
-          const extractedData = result.extractedQuery!;
+        // Use the classification from n8n (already done)
+        if (email.classification) {
+          const result: EmailProcessingResponse = {
+            classification: email.classification as EmailClassification,
+            extractedQuery: email.extractedQuery,
+            shouldReply: email.shouldReply || false,
+            replyMessage: email.replyMessage || undefined
+          };
           
-          onQueryLogged({
-            queryId,
-            customerName: extractedData.customerName,
-            customerEmail: extractedData.customerEmail,
-            serviceType: extractedData.serviceType,
-            elevatorBrand: extractedData.elevatorBrand,
-            buildingType: extractedData.buildingType,
-            address: extractedData.address,
-            urgency: extractedData.urgency,
-            description: extractedData.description,
-            status: 'Logged',
-            source: 'Email',
-            sla: '4-hour response',
-            assignedEngineer: 'Not assigned',
-            acknowledgedAt: new Date().toISOString()
-          });
+          setProcessingResult(result);
+          setClassification(result.classification);
+          
+          // Update email status based on classification
+          if (result.classification === 'JUNK') {
+            onStatusUpdate(email.id, 'Junk');
+          } else if (result.classification === 'INCOMPLETE') {
+            onStatusUpdate(email.id, 'Waiting for Customer');
+          } else if (result.classification === 'VALID' && result.extractedQuery) {
+            // Log the query
+            const queryId = `QRY-UK-${Math.floor(10000 + Math.random() * 90000)}`;
+            const extractedData = result.extractedQuery;
+            
+            onQueryLogged({
+              queryId,
+              customerName: extractedData.customerName,
+              customerEmail: extractedData.customerEmail,
+              serviceType: extractedData.serviceType,
+              elevatorBrand: extractedData.elevatorBrand,
+              buildingType: extractedData.buildingType,
+              address: extractedData.address,
+              urgency: extractedData.urgency,
+              description: extractedData.description,
+              status: 'Logged',
+              source: 'Email',
+              sla: '4-hour response',
+              assignedEngineer: 'Not assigned',
+              acknowledgedAt: new Date().toISOString()
+            });
+          }
+        } else {
+          setError('Email not yet classified');
         }
+        
+        setStep('complete');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to process email');
+        setError(err instanceof Error ? err.message : 'Failed to display classification');
         setStep('complete');
       }
     };
 
-    processEmailWorkflow();
+    showProcessingAnimation();
   }, [email.id]);
 
   const handleSendClarification = () => {
