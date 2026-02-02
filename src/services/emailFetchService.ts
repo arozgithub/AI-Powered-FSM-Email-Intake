@@ -1,7 +1,8 @@
 import type { Email } from '../App';
 
 // Configuration
-const API_ENDPOINT = import.meta.env.VITE_EMAIL_API_URL || 'http://localhost:5678/webhook/get-emails';
+const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'http://localhost:3000';
+const API_ENDPOINT = `${API_BASE_URL}/api/get-emails`;
 
 export interface FetchEmailsResponse {
   emails: Email[];
