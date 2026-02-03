@@ -136,46 +136,70 @@ export function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-6 mb-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-          <Card className="bg-gradient-to-br from-white to-green-50 w-full aspect-square text-center hover:shadow-xl transition-all duration-300 border-green-100 hover:scale-105">
-            <CardContent className="h-full flex flex-col items-center justify-center">
-              <div className="bg-green-100 p-4 rounded-full mb-4">
-                <CheckCircle2 className="w-12 h-12 text-green-600" />
+        <div className="grid gap-4 mb-8 grid-cols-2 lg:grid-cols-4">
+          {/* Total Queries Card */}
+          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
+            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
+              <CheckCircle2 className="w-10 h-10 text-green-600" />
+            </div>
+            <div className="uppercase text-xs font-bold text-green-600 pt-2 px-2 cursor-pointer">
+              Total Queries
+            </div>
+            <div className="font-bold text-gray-600 p-2 cursor-pointer">
+              <span className="text-xl">{stats.total}</span> Queries
+              <div className="text-gray-400 font-normal text-[11px] pt-4">
+                 By <span className="font-semibold text-gray-600"></span>
               </div>
-              <p className="text-base font-semibold text-gray-600 mb-2">Total Queries</p>
-              <p className="text-6xl font-bold text-gray-900">{stats.total}</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-white to-red-50 w-full aspect-square text-center hover:shadow-xl transition-all duration-300 border-red-100 hover:scale-105">
-            <CardContent className="h-full flex flex-col items-center justify-center">
-              <div className="bg-red-100 p-4 rounded-full mb-4">
-                <AlertCircle className="w-12 h-12 text-red-600" />
+          {/* Urgent Card */}
+          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
+            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
+              <AlertCircle className="w-10 h-10 text-red-600" />
+            </div>
+            <div className="uppercase text-xs font-bold text-red-600 pt-2 px-2 cursor-pointer">
+              Urgent Requests
+            </div>
+            <div className="font-bold text-gray-600 p-2 cursor-pointer">
+              <span className="text-xl">{stats.urgent}</span> Requests
+              <div className="text-gray-400 font-normal text-[11px] pt-4">
+                  <span className="font-semibold text-gray-600"> </span> 
               </div>
-              <p className="text-base font-semibold text-gray-600 mb-2">Urgent</p>
-              <p className="text-6xl font-bold text-red-600">{stats.urgent}</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-white to-blue-50 w-full aspect-square text-center hover:shadow-xl transition-all duration-300 border-blue-100 hover:scale-105">
-            <CardContent className="h-full flex flex-col items-center justify-center">
-              <div className="bg-blue-100 p-4 rounded-full mb-4">
-                <Wrench className="w-12 h-12 text-blue-600" />
+          {/* Maintenance Card */}
+          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
+            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
+              <Wrench className="w-10 h-10 text-blue-600" />
+            </div>
+            <div className="uppercase text-xs font-bold text-blue-600 pt-2 px-2 cursor-pointer">
+              Maintenance
+            </div>
+            <div className="font-bold text-gray-600 p-2 cursor-pointer">
+              <span className="text-xl">{stats.maintenance}</span> Scheduled
+              <div className="text-gray-400 font-normal text-[11px] pt-4">
+                  <span className="font-semibold text-gray-600"></span> 
               </div>
-              <p className="text-base font-semibold text-gray-600 mb-2">Maintenance</p>
-              <p className="text-6xl font-bold text-blue-600">{stats.maintenance}</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="bg-gradient-to-br from-white to-orange-50 w-full aspect-square text-center hover:shadow-xl transition-all duration-300 border-orange-100 hover:scale-105">
-            <CardContent className="h-full flex flex-col items-center justify-center">
-              <div className="bg-orange-100 p-4 rounded-full mb-4">
-                <Clock className="w-12 h-12 text-orange-600" />
+          {/* Repairs Card */}
+          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
+            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
+              <Clock className="w-10 h-10 text-orange-600" />
+            </div>
+            <div className="uppercase text-xs font-bold text-orange-600 pt-2 px-2 cursor-pointer">
+              Repairs 
+            </div>
+            <div className="font-bold text-gray-600 p-2 cursor-pointer">
+              <span className="text-xl">{stats.repair}</span> Active
+              <div className="text-gray-400 font-normal text-[11px] pt-4">
+                 By <span className="font-semibold text-gray-600">Support</span> • Ongoing
               </div>
-              <p className="text-base font-semibold text-gray-600 mb-2">Repairs</p>
-              <p className="text-6xl font-bold text-orange-600">{stats.repair}</p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Queries Table */}
@@ -191,40 +215,49 @@ export function Dashboard() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+              <table className="w-full min-w-[960px] table-fixed">
+                <colgroup>
+                  <col className="w-[18%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[22%]" />
+                  <col className="w-[14%]" />
+                  <col className="w-[10%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[8%]" />
+                </colgroup>
+                <thead className="border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider bg-blue-50">
                       Customer
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider bg-green-50">
                       Service Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider bg-purple-50">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider bg-amber-50">
                       Asset/Equipment
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider bg-red-50">
                       Urgency
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider bg-teal-50">
                       Received
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider bg-gray-100">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-black divide-solid">
                   {validQueries.map((email) => (
                     <tr 
                       key={email.id} 
                       onClick={() => setSelectedEmail(email)}
-                      className="hover:bg-gray-50 cursor-pointer transition-colors"
+                      className="cursor-pointer transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap bg-blue-50/30 hover:bg-blue-50/50">
                         <div className="flex items-center">
                           <User className="w-5 h-5 text-gray-400 mr-2" />
                           <div>
@@ -237,17 +270,17 @@ export function Dashboard() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap bg-green-50/30 hover:bg-green-50/50">
                         <div className="flex items-center">
-                          <Wrench className="w-4 h-4 text-gray-400 mr-2" />
+                          <Wrench className="w-4 h-4 text-green-500 mr-2" />
                           <span className="text-sm text-gray-900">
                             {email.extractedQuery?.serviceType || 'Not specified'}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 bg-purple-50/30 hover:bg-purple-50/50">
                         <div className="flex items-start">
-                          <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5 flex-shrink-0" />
+                          <MapPin className="w-4 h-4 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
                           <div className="text-sm text-gray-900">
                             {email.extractedQuery?.address || 'Not specified'}
                             {email.extractedQuery?.buildingType && (
@@ -261,12 +294,12 @@ export function Dashboard() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap bg-amber-50/30 hover:bg-amber-50/50">
                         <span className="text-sm text-gray-900">
                           {email.extractedQuery?.assetBrand || 'Not specified'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap bg-red-50/30 hover:bg-red-50/50">
                         <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           email.extractedQuery?.urgency?.toLowerCase().includes('urgent')
                             ? 'bg-red-100 text-red-800'
@@ -277,13 +310,13 @@ export function Dashboard() {
                           {email.extractedQuery?.urgency || 'Normal'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap bg-teal-50/30 hover:bg-teal-50/50">
                         <div className="flex items-center text-sm text-gray-500">
-                          <Calendar className="w-4 h-4 mr-1" />
+                          <Calendar className="w-4 h-4 mr-1 text-teal-500" />
                           {new Date(email.receivedAt).toLocaleDateString()}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm bg-gray-50/50 hover:bg-gray-100/50">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
