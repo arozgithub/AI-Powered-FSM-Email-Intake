@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2, X, FileText } from 'lucide-react';
+import { useState, type MouseEvent } from 'react';
+import { CheckCircle2, Clock, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2, FileText, AlertCircle } from 'lucide-react';
 import type { Email } from '../App';
-import { fetchEmails } from '../services/emailFetchService';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -10,53 +9,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
-export function Dashboard() {
-  const [emails, setEmails] = useState<Email[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [clearing, setClearing] = useState(false);
+interface DashboardProps {
+  emails: Email[];
+  onRefresh: () => void;
+}
+
+export function Dashboard({ emails, onRefresh }: DashboardProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedEmail, setSelectedEmail] = useState<Email | null>(null);
-
-  useEffect(() => {
-    loadEmails();
-  }, []);
-
-  const loadEmails = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const fetchedEmails = await fetchEmails();
-      setEmails(fetchedEmails);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load emails');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClearAll = async () => {
-    if (!confirm('Are you sure you want to delete all emails? This cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setClearing(true);
-      const response = await fetch(`${API_BASE_URL}/api/clear-emails`, {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to clear emails');
-      }
-
-      await loadEmails(); // Reload to show empty state
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to clear emails');
-    } finally {
-      setClearing(false);
-    }
-  };
 
   const handleDelete = async (emailId: string) => {
     if (!confirm('Are you sure you want to delete this service request?')) {
@@ -73,9 +33,10 @@ export function Dashboard() {
         throw new Error('Failed to delete email');
       }
 
-      await loadEmails(); // Refresh the list
+      onRefresh(); // Refresh the list via parent
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete email');
+      console.error('Failed to delete email:', err);
+      // We could add a toast or alert here
     } finally {
       setDeletingId(null);
     }
@@ -93,34 +54,6 @@ export function Dashboard() {
     repair: validQueries.filter(e => e.extractedQuery?.serviceType?.toLowerCase().includes('repair')).length,
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-8">
-        <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
-          <p className="text-destructive">Error: {error}</p>
-          <Button 
-            onClick={loadEmails}
-            variant="destructive"
-            className="mt-2"
-          >
-            Retry
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
@@ -130,14 +63,7 @@ export function Dashboard() {
             <h1 className="text-2xl font-semibold text-foreground mb-1">Service Requests Dashboard</h1>
             <p className="text-muted-foreground">Overview of all logged service queries</p>
           </div>
-          <Button
-            onClick={handleClearAll}
-            disabled={clearing || emails.length === 0}
-            variant="destructive"
-          >
-            <Trash2 className="size-4 mr-2" />
-            {clearing ? 'Clearing...' : 'Clear All Data'}
-          </Button>
+          {/* Action buttons moved to App header */}
         </div>
 
         {/* Stats Cards */}
@@ -217,8 +143,8 @@ export function Dashboard() {
                 </TableHeader>
                 <TableBody>
                   {validQueries.map((email) => (
-                    <TableRow 
-                      key={email.id} 
+                    <TableRow
+                      key={email.id}
                       onClick={() => setSelectedEmail(email)}
                       className="cursor-pointer"
                     >
@@ -260,12 +186,12 @@ export function Dashboard() {
                       </TableCell>
                       <TableCell>
                         <Badge variant={
-                          email.extractedQuery?.urgency?.toLowerCase().includes('urgent') || 
-                          email.extractedQuery?.urgency?.toLowerCase().includes('emergency')
+                          email.extractedQuery?.urgency?.toLowerCase().includes('urgent') ||
+                            email.extractedQuery?.urgency?.toLowerCase().includes('emergency')
                             ? 'destructive'
                             : email.extractedQuery?.urgency?.toLowerCase().includes('high')
-                            ? 'warning'
-                            : 'success'
+                              ? 'warning'
+                              : 'success'
                         }>
                           {email.extractedQuery?.urgency || 'Normal'}
                         </Badge>
@@ -278,7 +204,7 @@ export function Dashboard() {
                       </TableCell>
                       <TableCell className="text-right">
                         <Button
-                          onClick={(e) => {
+                          onClick={(e: MouseEvent) => {
                             e.stopPropagation();
                             handleDelete(email.id);
                           }}
@@ -297,13 +223,6 @@ export function Dashboard() {
             )}
           </CardContent>
         </Card>
-
-        {/* Refresh Button */}
-        <div className="mt-6 text-center">
-          <Button onClick={loadEmails}>
-            Refresh Data
-          </Button>
-        </div>
       </div>
 
       {/* Service Request Detail Modal */}
@@ -313,16 +232,14 @@ export function Dashboard() {
             <>
               <DialogHeader>
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-full ${
-                    selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                      ? 'bg-destructive/10'
-                      : 'bg-success/10'
-                  }`}>
-                    <FileText className={`size-5 ${
-                      selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                        ? 'text-destructive'
-                        : 'text-success'
-                    }`} />
+                  <div className={`p-2 rounded-full ${selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                    ? 'bg-destructive/10'
+                    : 'bg-success/10'
+                    }`}>
+                    <FileText className={`size-5 ${selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                      ? 'text-destructive'
+                      : 'text-success'
+                      }`} />
                   </div>
                   <div>
                     <DialogTitle>Service Request Details</DialogTitle>
@@ -375,8 +292,8 @@ export function Dashboard() {
                         selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
                           ? 'destructive'
                           : selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('high')
-                          ? 'warning'
-                          : 'success'
+                            ? 'warning'
+                            : 'success'
                       }>
                         {selectedEmail.extractedQuery?.urgency || 'Normal'}
                       </Badge>
@@ -447,7 +364,7 @@ export function Dashboard() {
                     </Badge>
                   </div>
                   <Button
-                    onClick={(e) => {
+                    onClick={(e: MouseEvent) => {
                       e.stopPropagation();
                       handleDelete(selectedEmail.id);
                       setSelectedEmail(null);

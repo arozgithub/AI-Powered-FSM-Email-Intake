@@ -67,11 +67,11 @@ export default function App() {
   const loadEmails = async () => {
     setIsLoadingEmails(true);
     setEmailsError(null);
-    
+
     try {
       const fetchedEmails = await fetchEmails();
       setEmails(fetchedEmails);
-      
+
       if (fetchedEmails.length === 0) {
         setEmailsError('No emails found. Emails will appear here when received from n8n workflow.');
       }
@@ -92,7 +92,7 @@ export default function App() {
   };
 
   const handleStatusUpdate = (emailId: string, newStatus: Email['status']) => {
-    setEmails(emails.map(e => 
+    setEmails(emails.map(e =>
       e.id === emailId ? { ...e, status: newStatus } : e
     ));
   };
@@ -145,7 +145,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-4">
             {/* Navigation Tabs */}
-            <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as 'inbox' | 'dashboard')}>
+            <Tabs value={currentView} onValueChange={(v: string) => setCurrentView(v as 'inbox' | 'dashboard')}>
               <TabsList>
                 <TabsTrigger value="inbox" className="gap-2">
                   <Mail className="size-4" />
@@ -157,7 +157,7 @@ export default function App() {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            
+
             <Button
               onClick={loadEmails}
               disabled={isLoadingEmails}
@@ -183,85 +183,85 @@ export default function App() {
 
       {/* Main Content */}
       {currentView === 'dashboard' ? (
-        <Dashboard />
+        <Dashboard emails={emails} onRefresh={loadEmails} />
       ) : (
-      <div className="flex h-[calc(100vh-73px)]">
-        {/* Inbox List - Left Panel */}
-        <div className="w-80 border-r border-border bg-card overflow-y-auto">
-          {emailsError ? (
-            <div className="p-4">
-              <div className="bg-warning-muted border border-warning rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="size-5 text-warning flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-medium text-foreground mb-1">Cannot Load Emails</h3>
-                    <p className="text-sm text-muted-foreground">{emailsError}</p>
-                    <Button
-                      onClick={loadEmails}
-                      variant="ghost"
-                      size="sm"
-                      className="mt-3 text-info hover:text-info"
-                    >
-                      Try Again
-                    </Button>
+        <div className="flex h-[calc(100vh-73px)]">
+          {/* Inbox List - Left Panel */}
+          <div className="w-80 border-r border-border bg-card overflow-y-auto">
+            {emailsError ? (
+              <div className="p-4">
+                <div className="bg-warning-muted border border-warning rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="size-5 text-warning flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-foreground mb-1">Cannot Load Emails</h3>
+                      <p className="text-sm text-muted-foreground">{emailsError}</p>
+                      <Button
+                        onClick={loadEmails}
+                        variant="ghost"
+                        size="sm"
+                        className="mt-3 text-info hover:text-info"
+                      >
+                        Try Again
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ) : isLoadingEmails && emails.length === 0 ? (
-            <div className="p-4">
-              <div className="flex items-center justify-center py-12">
-                <div className="text-center">
-                  <RefreshCw className="size-8 text-muted-foreground animate-spin mx-auto mb-3" />
-                  <p className="text-sm text-muted-foreground">Loading emails...</p>
+            ) : isLoadingEmails && emails.length === 0 ? (
+              <div className="p-4">
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <RefreshCw className="size-8 text-muted-foreground animate-spin mx-auto mb-3" />
+                    <p className="text-sm text-muted-foreground">Loading emails...</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <InboxList 
-              emails={emails} 
-              selectedEmailId={selectedEmailId}
-              onEmailSelect={handleEmailSelect}
-              onEmailDeleted={loadEmails}
-            />
-          )}
-        </div>
-
-        {/* Email Detail - Center Panel */}
-        <div className="flex-1 overflow-y-auto bg-muted">
-          {selectedEmail ? (
-            showQueryConfirmation && loggedQuery ? (
-              <QueryConfirmation query={loggedQuery} />
             ) : (
-              <EmailDetail email={selectedEmail} />
-            )
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center text-muted-foreground">
-                {emails.length === 0 && !isLoadingEmails && !emailsError ? (
-                  <div>
-                    <p className="mb-2">No emails available</p>
-                    <p className="text-sm text-muted-foreground">Emails will appear when received from n8n Gmail integration</p>
-                  </div>
-                ) : (
-                  <p>Select an email to view details</p>
-                )}
+              <InboxList
+                emails={emails}
+                selectedEmailId={selectedEmailId}
+                onEmailSelect={handleEmailSelect}
+                onEmailDeleted={loadEmails}
+              />
+            )}
+          </div>
+
+          {/* Email Detail - Center Panel */}
+          <div className="flex-1 overflow-y-auto bg-muted">
+            {selectedEmail ? (
+              showQueryConfirmation && loggedQuery ? (
+                <QueryConfirmation query={loggedQuery} />
+              ) : (
+                <EmailDetail email={selectedEmail} />
+              )
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center text-muted-foreground">
+                  {emails.length === 0 && !isLoadingEmails && !emailsError ? (
+                    <div>
+                      <p className="mb-2">No emails available</p>
+                      <p className="text-sm text-muted-foreground">Emails will appear when received from n8n Gmail integration</p>
+                    </div>
+                  ) : (
+                    <p>Select an email to view details</p>
+                  )}
+                </div>
               </div>
+            )}
+          </div>
+
+          {/* AI Agent Panel - Right Panel */}
+          {selectedEmail && !showQueryConfirmation && (
+            <div className="w-80 border-l border-border bg-card overflow-y-auto">
+              <AIAgentPanel
+                email={selectedEmail}
+                onStatusUpdate={handleStatusUpdate}
+                onQueryLogged={handleQueryLogged}
+              />
             </div>
           )}
         </div>
-
-        {/* AI Agent Panel - Right Panel */}
-        {selectedEmail && !showQueryConfirmation && (
-          <div className="w-80 border-l border-border bg-card overflow-y-auto">
-            <AIAgentPanel 
-              email={selectedEmail}
-              onStatusUpdate={handleStatusUpdate}
-              onQueryLogged={handleQueryLogged}
-            />
-          </div>
-        )}
-      </div>
       )}
 
       {/* Query Logged Modal */}
