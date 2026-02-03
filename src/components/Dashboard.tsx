@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2, X, Phone, FileText } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, Calendar, Mail, User, Building2, Wrench, MapPin, Trash2, X, FileText } from 'lucide-react';
 import type { Email } from '../App';
 import { fetchEmails } from '../services/emailFetchService';
-import { Card, CardContent } from './ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 
 const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
@@ -93,8 +97,8 @@ export function Dashboard() {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -103,429 +107,363 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="p-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">Error: {error}</p>
-          <button 
+        <div className="bg-destructive/10 border border-destructive rounded-lg p-4">
+          <p className="text-destructive">Error: {error}</p>
+          <Button 
             onClick={loadEmails}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            variant="destructive"
+            className="mt-2"
           >
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Requests Dashboard</h1>
-            <p className="text-gray-600">Overview of all logged service queries (Dashboard v2)</p>
+            <h1 className="text-2xl font-semibold text-foreground mb-1">Service Requests Dashboard</h1>
+            <p className="text-muted-foreground">Overview of all logged service queries</p>
           </div>
-          <button
+          <Button
             onClick={handleClearAll}
             disabled={clearing || emails.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="destructive"
           >
-            <Trash2 className="size-4" />
+            <Trash2 className="size-4 mr-2" />
             {clearing ? 'Clearing...' : 'Clear All Data'}
-          </button>
+          </Button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid gap-4 mb-8 grid-cols-2 lg:grid-cols-4">
-          {/* Total Queries Card */}
-          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
-            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
-            </div>
-            <div className="uppercase text-xs font-bold text-green-600 pt-2 px-2 cursor-pointer">
-              Total Queries
-            </div>
-            <div className="font-bold text-gray-600 p-2 cursor-pointer">
-              <span className="text-xl">{stats.total}</span> Queries
-              <div className="text-gray-400 font-normal text-[11px] pt-4">
-                 By <span className="font-semibold text-gray-600"></span>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Total Queries</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-semibold text-foreground">{stats.total}</span>
+                <CheckCircle2 className="size-8 text-success" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Urgent Card */}
-          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
-            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
-              <AlertCircle className="w-10 h-10 text-red-600" />
-            </div>
-            <div className="uppercase text-xs font-bold text-red-600 pt-2 px-2 cursor-pointer">
-              Urgent Requests
-            </div>
-            <div className="font-bold text-gray-600 p-2 cursor-pointer">
-              <span className="text-xl">{stats.urgent}</span> Requests
-              <div className="text-gray-400 font-normal text-[11px] pt-4">
-                  <span className="font-semibold text-gray-600"> </span> 
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Urgent Requests</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-semibold text-foreground">{stats.urgent}</span>
+                <AlertCircle className="size-8 text-destructive" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Maintenance Card */}
-          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
-            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
-              <Wrench className="w-10 h-10 text-blue-600" />
-            </div>
-            <div className="uppercase text-xs font-bold text-blue-600 pt-2 px-2 cursor-pointer">
-              Maintenance
-            </div>
-            <div className="font-bold text-gray-600 p-2 cursor-pointer">
-              <span className="text-xl">{stats.maintenance}</span> Scheduled
-              <div className="text-gray-400 font-normal text-[11px] pt-4">
-                  <span className="font-semibold text-gray-600"></span> 
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Maintenance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-semibold text-foreground">{stats.maintenance}</span>
+                <Wrench className="size-8 text-info" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Repairs Card */}
-          <div className="bg-white p-2 rounded-xl shadow-lg w-full max-w-[240px] mx-auto transition-transform hover:scale-[1.02]">
-            <div className="bg-gray-100 w-full h-24 rounded-xl flex items-center justify-center transition-transform hover:scale-[0.98] origin-bottom cursor-pointer">
-              <Clock className="w-10 h-10 text-orange-600" />
-            </div>
-            <div className="uppercase text-xs font-bold text-orange-600 pt-2 px-2 cursor-pointer">
-              Repairs 
-            </div>
-            <div className="font-bold text-gray-600 p-2 cursor-pointer">
-              <span className="text-xl">{stats.repair}</span> Active
-              <div className="text-gray-400 font-normal text-[11px] pt-4">
-                 By <span className="font-semibold text-gray-600">Support</span> • Ongoing
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Repairs</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-semibold text-foreground">{stats.repair}</span>
+                <Clock className="size-8 text-warning" />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Queries Table */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Service Requests</h2>
-          </div>
-
-          {validQueries.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Mail className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-              <p>No service requests logged yet</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[960px] table-fixed">
-                <colgroup>
-                  <col className="w-[18%]" />
-                  <col className="w-[12%]" />
-                  <col className="w-[22%]" />
-                  <col className="w-[14%]" />
-                  <col className="w-[10%]" />
-                  <col className="w-[12%]" />
-                  <col className="w-[8%]" />
-                </colgroup>
-                <thead className="border-b border-gray-200">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-blue-700 uppercase tracking-wider bg-blue-50">
-                      Customer
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider bg-green-50">
-                      Service Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-purple-700 uppercase tracking-wider bg-purple-50">
-                      Location
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-amber-700 uppercase tracking-wider bg-amber-50">
-                      Asset/Equipment
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-red-700 uppercase tracking-wider bg-red-50">
-                      Urgency
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider bg-teal-50">
-                      Received
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider bg-gray-100">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-black divide-solid">
+        <Card>
+          <CardHeader>
+            <CardTitle>Service Requests</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {validQueries.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">
+                <Mail className="size-16 mx-auto mb-4 text-muted" />
+                <p>No service requests logged yet</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Service Type</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Asset</TableHead>
+                    <TableHead>Urgency</TableHead>
+                    <TableHead>Received</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {validQueries.map((email) => (
-                    <tr 
+                    <TableRow 
                       key={email.id} 
                       onClick={() => setSelectedEmail(email)}
-                      className="cursor-pointer transition-colors"
+                      className="cursor-pointer"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap bg-blue-50/30 hover:bg-blue-50/50">
-                        <div className="flex items-center">
-                          <User className="w-5 h-5 text-gray-400 mr-2" />
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <User className="size-4 text-muted-foreground" />
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <p className="font-medium text-foreground">
                               {email.extractedQuery?.customerName || email.senderName}
-                            </div>
-                            <div className="text-sm text-gray-500">
+                            </p>
+                            <p className="text-sm text-muted-foreground">
                               {email.extractedQuery?.customerEmail || email.senderEmail}
-                            </div>
+                            </p>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap bg-green-50/30 hover:bg-green-50/50">
-                        <div className="flex items-center">
-                          <Wrench className="w-4 h-4 text-green-500 mr-2" />
-                          <span className="text-sm text-gray-900">
-                            {email.extractedQuery?.serviceType || 'Not specified'}
-                          </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Wrench className="size-4 text-muted-foreground" />
+                          <span>{email.extractedQuery?.serviceType || 'Not specified'}</span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 bg-purple-50/30 hover:bg-purple-50/50">
-                        <div className="flex items-start">
-                          <MapPin className="w-4 h-4 text-purple-500 mr-2 mt-0.5 flex-shrink-0" />
-                          <div className="text-sm text-gray-900">
-                            {email.extractedQuery?.address || 'Not specified'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-start gap-2">
+                          <MapPin className="size-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p>{email.extractedQuery?.address || 'Not specified'}</p>
                             {email.extractedQuery?.buildingType && (
-                              <div className="flex items-center mt-1">
-                                <Building2 className="w-3 h-3 text-gray-400 mr-1" />
-                                <span className="text-xs text-gray-500">
-                                  {email.extractedQuery.buildingType}
-                                </span>
-                              </div>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                <Building2 className="size-3" />
+                                {email.extractedQuery.buildingType}
+                              </p>
                             )}
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap bg-amber-50/30 hover:bg-amber-50/50">
-                        <span className="text-sm text-gray-900">
-                          {email.extractedQuery?.assetBrand || 'Not specified'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap bg-red-50/30 hover:bg-red-50/50">
-                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          email.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                            ? 'bg-red-100 text-red-800'
+                      </TableCell>
+                      <TableCell>
+                        {email.extractedQuery?.assetBrand || 'Not specified'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          email.extractedQuery?.urgency?.toLowerCase().includes('urgent') || 
+                          email.extractedQuery?.urgency?.toLowerCase().includes('emergency')
+                            ? 'destructive'
                             : email.extractedQuery?.urgency?.toLowerCase().includes('high')
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}>
+                            ? 'warning'
+                            : 'success'
+                        }>
                           {email.extractedQuery?.urgency || 'Normal'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap bg-teal-50/30 hover:bg-teal-50/50">
-                        <div className="flex items-center text-sm text-gray-500">
-                          <Calendar className="w-4 h-4 mr-1 text-teal-500" />
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Calendar className="size-4" />
                           {new Date(email.receivedAt).toLocaleDateString()}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm bg-gray-50/50 hover:bg-gray-100/50">
-                        <button
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(email.id);
                           }}
                           disabled={deletingId === email.id}
-                          className="text-red-600 hover:text-red-900 disabled:opacity-50 p-2 hover:bg-red-50 rounded transition-colors"
-                          title="Delete this request"
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
                         >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Refresh Button */}
         <div className="mt-6 text-center">
-          <button
-            onClick={loadEmails}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
+          <Button onClick={loadEmails}>
             Refresh Data
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Service Request Detail Modal */}
-      {selectedEmail && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-          onClick={() => setSelectedEmail(null)}
-        >
-          <div 
-            className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-full ${
-                  selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                    ? 'bg-red-100'
-                    : 'bg-green-100'
-                }`}>
-                  <FileText className={`w-5 h-5 ${
+      <Dialog open={!!selectedEmail} onOpenChange={() => setSelectedEmail(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          {selectedEmail && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-full ${
                     selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                      ? 'text-red-600'
-                      : 'text-green-600'
-                  }`} />
+                      ? 'bg-destructive/10'
+                      : 'bg-success/10'
+                  }`}>
+                    <FileText className={`size-5 ${
+                      selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
+                        ? 'text-destructive'
+                        : 'text-success'
+                    }`} />
+                  </div>
+                  <div>
+                    <DialogTitle>Service Request Details</DialogTitle>
+                    <p className="text-sm text-muted-foreground">
+                      {new Date(selectedEmail.receivedAt).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Service Request Details</h2>
-                  <p className="text-sm text-gray-500">
-                    {new Date(selectedEmail.receivedAt).toLocaleString()}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedEmail(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
+              </DialogHeader>
 
-            {/* Modal Content */}
-            <div className="p-6 space-y-6">
-              {/* Customer Information */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Customer Information
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-6 mt-4">
+                {/* Customer Information */}
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <User className="size-4" />
+                    Customer Information
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4 grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Name</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-muted-foreground mb-1">Name</p>
+                      <p className="text-sm font-medium text-foreground">
                         {selectedEmail.extractedQuery?.customerName || selectedEmail.senderName}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Email</p>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs text-muted-foreground mb-1">Email</p>
+                      <p className="text-sm text-foreground">
                         {selectedEmail.extractedQuery?.customerEmail || selectedEmail.senderEmail}
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Service Details */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Wrench className="w-4 h-4" />
-                  Service Details
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
+                {/* Service Details */}
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Wrench className="size-4" />
+                    Service Details
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4 grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Service Type</p>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-xs text-muted-foreground mb-1">Service Type</p>
+                      <p className="text-sm font-medium text-foreground">
                         {selectedEmail.extractedQuery?.serviceType || 'Not specified'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Urgency</p>
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      <p className="text-xs text-muted-foreground mb-1">Urgency</p>
+                      <Badge variant={
                         selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('urgent')
-                          ? 'bg-red-100 text-red-800'
+                          ? 'destructive'
                           : selectedEmail.extractedQuery?.urgency?.toLowerCase().includes('high')
-                          ? 'bg-orange-100 text-orange-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}>
+                          ? 'warning'
+                          : 'success'
+                      }>
                         {selectedEmail.extractedQuery?.urgency || 'Normal'}
-                      </span>
+                      </Badge>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Asset/Equipment Brand</p>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs text-muted-foreground mb-1">Asset/Equipment</p>
+                      <p className="text-sm text-foreground">
                         {selectedEmail.extractedQuery?.assetBrand || 'Not specified'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-1">Building Type</p>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs text-muted-foreground mb-1">Building Type</p>
+                      <p className="text-sm text-foreground">
                         {selectedEmail.extractedQuery?.buildingType || 'Not specified'}
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Location */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <MapPin className="w-4 h-4" />
-                  Location
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-900">
-                    {selectedEmail.extractedQuery?.address || 'Not specified'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  Issue Description
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                    {selectedEmail.extractedQuery?.description || selectedEmail.body}
-                  </p>
-                </div>
-              </div>
-
-              {/* Original Email */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <Mail className="w-4 h-4" />
-                  Original Email
-                </h3>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Subject</p>
-                  <p className="text-sm font-medium text-gray-900 mb-3">{selectedEmail.subject}</p>
-                  <p className="text-xs text-gray-500 mb-1">Message</p>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap max-h-40 overflow-y-auto">
-                    {selectedEmail.body}
-                  </p>
-                </div>
-              </div>
-
-              {/* Status Badge */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                {/* Location */}
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Status</p>
-                  <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${
-                    selectedEmail.status === 'Query Logged'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {selectedEmail.status}
-                  </span>
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <MapPin className="size-4" />
+                    Location
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4">
+                    <p className="text-sm text-foreground">
+                      {selectedEmail.extractedQuery?.address || 'Not specified'}
+                    </p>
+                  </div>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(selectedEmail.id);
-                    setSelectedEmail(null);
-                  }}
-                  disabled={deletingId === selectedEmail.id}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Delete Request
-                </button>
+
+                {/* Description */}
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <FileText className="size-4" />
+                    Issue Description
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4">
+                    <p className="text-sm text-foreground whitespace-pre-wrap">
+                      {selectedEmail.extractedQuery?.description || selectedEmail.body}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Original Email */}
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Mail className="size-4" />
+                    Original Email
+                  </h3>
+                  <div className="bg-muted rounded-lg p-4">
+                    <p className="text-xs text-muted-foreground mb-1">Subject</p>
+                    <p className="text-sm font-medium text-foreground mb-3">{selectedEmail.subject}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Message</p>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap max-h-40 overflow-y-auto">
+                      {selectedEmail.body}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Footer Actions */}
+                <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Status</p>
+                    <Badge variant={selectedEmail.status === 'Query Logged' ? 'success' : 'info'}>
+                      {selectedEmail.status}
+                    </Badge>
+                  </div>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(selectedEmail.id);
+                      setSelectedEmail(null);
+                    }}
+                    disabled={deletingId === selectedEmail.id}
+                    variant="destructive"
+                  >
+                    <Trash2 className="size-4 mr-2" />
+                    Delete Request
+                  </Button>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

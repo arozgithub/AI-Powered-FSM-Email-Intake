@@ -48,12 +48,14 @@
             "vaul": "^1.1.2"
       },
       "devDependencies": {
+            "@tailwindcss/vite": "^4.1.18",
             "@types/node": "^20.10.0",
             "@types/react": "^19.2.10",
             "@types/react-dom": "^19.2.3",
             "@vitejs/plugin-react-swc": "^3.10.2",
             "cors": "^2.8.6",
             "express": "^4.22.1",
+            "tailwindcss": "^4.1.18",
             "typescript": "^5.9.3",
             "vite": "6.3.5"
       },

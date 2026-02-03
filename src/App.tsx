@@ -8,6 +8,8 @@ import { Dashboard } from './components/Dashboard';
 import type { ExtractedQuery } from './types/emailProcessing';
 import { fetchEmails } from './services/emailFetchService';
 import { RefreshCw, AlertCircle, LayoutDashboard, Mail, Trash2 } from 'lucide-react';
+import { Button } from './components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from './components/ui/tabs';
 
 const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
@@ -133,59 +135,48 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200">
+      <header className="bg-card border-b border-border">
         <div className="px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="font-semibold text-slate-900">FSM Email Intake System</h1>
-            <p className="text-sm text-slate-600">AI-Powered Service Desk</p>
+            <h1 className="font-semibold text-foreground">FSM Email Intake System</h1>
+            <p className="text-sm text-muted-foreground">AI-Powered Service Desk</p>
           </div>
           <div className="flex items-center gap-4">
             {/* Navigation Tabs */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentView('inbox')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'inbox'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <Mail className="size-4" />
-                Inbox
-              </button>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  currentView === 'dashboard'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <LayoutDashboard className="size-4" />
-                Dashboard
-              </button>
-            </div>
+            <Tabs value={currentView} onValueChange={(v) => setCurrentView(v as 'inbox' | 'dashboard')}>
+              <TabsList>
+                <TabsTrigger value="inbox" className="gap-2">
+                  <Mail className="size-4" />
+                  Inbox
+                </TabsTrigger>
+                <TabsTrigger value="dashboard" className="gap-2">
+                  <LayoutDashboard className="size-4" />
+                  Dashboard
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
             
-            <button
+            <Button
               onClick={loadEmails}
               disabled={isLoadingEmails}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+              variant="default"
+              size="default"
             >
-              <RefreshCw className={`size-4 ${isLoadingEmails ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`size-4 mr-2 ${isLoadingEmails ? 'animate-spin' : ''}`} />
               {isLoadingEmails ? 'Refreshing...' : 'Refresh'}
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleClearAll}
               disabled={clearing || emails.length === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              title="Delete all emails"
+              variant="destructive"
+              size="default"
             >
-              <Trash2 className="size-4" />
+              <Trash2 className="size-4 mr-2" />
               {clearing ? 'Clearing...' : 'Clear All'}
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -194,23 +185,25 @@ export default function App() {
       {currentView === 'dashboard' ? (
         <Dashboard />
       ) : (
-      <div className="flex h-[calc(100vh-97px)]">
+      <div className="flex h-[calc(100vh-73px)]">
         {/* Inbox List - Left Panel */}
-        <div className="w-96 border-r border-slate-200 bg-white overflow-y-auto">
+        <div className="w-80 border-r border-border bg-card overflow-y-auto">
           {emailsError ? (
             <div className="p-4">
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="bg-warning-muted border border-warning rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="size-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="size-5 text-warning flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="font-medium text-slate-900 mb-1">Cannot Load Emails</h3>
-                    <p className="text-sm text-slate-600">{emailsError}</p>
-                    <button
+                    <h3 className="font-medium text-foreground mb-1">Cannot Load Emails</h3>
+                    <p className="text-sm text-muted-foreground">{emailsError}</p>
+                    <Button
                       onClick={loadEmails}
-                      className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3 text-info hover:text-info"
                     >
                       Try Again
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -219,8 +212,8 @@ export default function App() {
             <div className="p-4">
               <div className="flex items-center justify-center py-12">
                 <div className="text-center">
-                  <RefreshCw className="size-8 text-slate-400 animate-spin mx-auto mb-3" />
-                  <p className="text-sm text-slate-600">Loading emails...</p>
+                  <RefreshCw className="size-8 text-muted-foreground animate-spin mx-auto mb-3" />
+                  <p className="text-sm text-muted-foreground">Loading emails...</p>
                 </div>
               </div>
             </div>
@@ -235,7 +228,7 @@ export default function App() {
         </div>
 
         {/* Email Detail - Center Panel */}
-        <div className="flex-1 overflow-y-auto bg-slate-50">
+        <div className="flex-1 overflow-y-auto bg-muted">
           {selectedEmail ? (
             showQueryConfirmation && loggedQuery ? (
               <QueryConfirmation query={loggedQuery} />
@@ -244,11 +237,11 @@ export default function App() {
             )
           ) : (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center text-slate-500">
+              <div className="text-center text-muted-foreground">
                 {emails.length === 0 && !isLoadingEmails && !emailsError ? (
                   <div>
                     <p className="mb-2">No emails available</p>
-                    <p className="text-sm text-slate-400">Emails will appear when received from n8n Gmail integration</p>
+                    <p className="text-sm text-muted-foreground">Emails will appear when received from n8n Gmail integration</p>
                   </div>
                 ) : (
                   <p>Select an email to view details</p>
@@ -260,7 +253,7 @@ export default function App() {
 
         {/* AI Agent Panel - Right Panel */}
         {selectedEmail && !showQueryConfirmation && (
-          <div className="w-96 border-l border-slate-200 bg-white overflow-y-auto">
+          <div className="w-80 border-l border-border bg-card overflow-y-auto">
             <AIAgentPanel 
               email={selectedEmail}
               onStatusUpdate={handleStatusUpdate}

@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Mail, Clock, CheckCircle2, XCircle, AlertCircle, Trash2 } from 'lucide-react';
 import type { Email } from '../App';
+import { Badge } from './ui/badge';
+import { Button } from './ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
 
 const API_BASE_URL = import.meta.env.VITE_EMAIL_API_URL || 'https://ai-powered-fsm-email-intake-1.vercel.app';
 
@@ -10,13 +13,6 @@ interface InboxListProps {
   onEmailSelect: (emailId: string) => void;
   onEmailDeleted?: () => void;
 }
-
-const statusColors = {
-  'Unprocessed': 'bg-blue-100 text-blue-800',
-  'Junk': 'bg-slate-100 text-slate-600',
-  'Waiting for Customer': 'bg-amber-100 text-amber-800',
-  'Query Logged': 'bg-green-100 text-green-800'
-};
 
 type InboxTab = 'Query Logged' | 'Waiting for Customer' | 'Junk';
 
@@ -71,111 +67,107 @@ export function InboxList({ emails, selectedEmailId, onEmailSelect, onEmailDelet
     'Junk': emails.filter(e => e.status === 'Junk').length,
   };
 
+  const getStatusBadgeVariant = (status: Email['status']) => {
+    switch (status) {
+      case 'Query Logged': return 'success';
+      case 'Waiting for Customer': return 'warning';
+      case 'Junk': return 'muted';
+      default: return 'secondary';
+    }
+  };
+
+  const renderEmailList = (tabStatus: InboxTab) => {
+    const tabEmails = emails.filter(email => email.status === tabStatus);
+    
+    if (tabEmails.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
+          <Mail className="size-12 mb-2" />
+          <p className="text-sm">No {tabStatus.toLowerCase()} emails</p>
+        </div>
+      );
+    }
+
+    return tabEmails.map((email) => (
+      <div
+        key={email.id}
+        onClick={() => onEmailSelect(email.id)}
+        className={`p-4 border-b border-border cursor-pointer transition-colors ${
+          selectedEmailId === email.id 
+            ? 'bg-muted border-l-2 border-l-primary' 
+            : 'hover:bg-muted/50'
+        }`}
+      >
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Mail className="size-4 text-muted-foreground flex-shrink-0" />
+              <p className="font-medium text-foreground truncate">{email.senderName}</p>
+            </div>
+            <p className="text-sm text-muted-foreground truncate">{email.senderEmail}</p>
+          </div>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="size-3" />
+              {formatDateTime(email.receivedAt)}
+            </div>
+            <Button
+              onClick={(e) => handleDelete(email.id, e)}
+              disabled={deletingId === email.id}
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="size-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <p className="text-sm text-foreground mb-2 truncate">{email.subject}</p>
+        
+        <Badge variant={getStatusBadgeVariant(email.status)}>
+          {email.status}
+        </Badge>
+      </div>
+    ));
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="p-4 border-b border-slate-200">
-        <h2 className="font-medium text-slate-900 mb-4">Inbox</h2>
+      <div className="p-4 border-b border-border">
+        <h2 className="font-medium text-foreground mb-4">Inbox</h2>
         
-        {/* Tabs */}
-        <div className="flex gap-1">
-          <button
-            onClick={() => setActiveTab('Query Logged')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'Query Logged'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <CheckCircle2 className="size-4" />
-            Query Logged
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
-              {counts['Query Logged']}
-            </span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('Waiting for Customer')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'Waiting for Customer'
-                ? 'bg-amber-100 text-amber-800'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <AlertCircle className="size-4" />
-            Waiting
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
-              {counts['Waiting for Customer']}
-            </span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('Junk')}
-            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'Junk'
-                ? 'bg-slate-100 text-slate-800'
-                : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            <XCircle className="size-4" />
-            Junk
-            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-white text-xs">
-              {counts['Junk']}
-            </span>
-          </button>
-        </div>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as InboxTab)}>
+          <TabsList className="w-full grid grid-cols-3">
+            <TabsTrigger value="Query Logged" className="text-xs gap-1">
+              <CheckCircle2 className="size-3" />
+              Logged
+              <span className="ml-1 text-[10px] bg-background px-1 rounded">
+                {counts['Query Logged']}
+              </span>
+            </TabsTrigger>
+            
+            <TabsTrigger value="Waiting for Customer" className="text-xs gap-1">
+              <AlertCircle className="size-3" />
+              Waiting
+              <span className="ml-1 text-[10px] bg-background px-1 rounded">
+                {counts['Waiting for Customer']}
+              </span>
+            </TabsTrigger>
+            
+            <TabsTrigger value="Junk" className="text-xs gap-1">
+              <XCircle className="size-3" />
+              Junk
+              <span className="ml-1 text-[10px] bg-background px-1 rounded">
+                {counts['Junk']}
+              </span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {filteredEmails.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 text-slate-400">
-            <Mail className="size-12 mb-2" />
-            <p className="text-sm">No {activeTab.toLowerCase()} emails</p>
-          </div>
-        ) : (
-          filteredEmails.map((email) => (
-          <div
-            key={email.id}
-            onClick={() => onEmailSelect(email.id)}
-            className={`p-4 border-b border-slate-200 cursor-pointer transition-colors ${
-              selectedEmailId === email.id 
-                ? 'bg-blue-50 border-l-4 border-l-blue-500' 
-                : 'hover:bg-slate-50'
-            }`}
-          >
-            <div className="flex items-start justify-between gap-2 mb-2">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <Mail className="size-4 text-slate-400 flex-shrink-0" />
-                  <p className="font-medium text-slate-900 truncate">{email.senderName}</p>
-                </div>
-                <p className="text-sm text-slate-600 truncate">{email.senderEmail}</p>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="text-xs text-slate-500 flex items-center gap-1">
-                  <Clock className="size-3" />
-                  {formatDateTime(email.receivedAt)}
-                </div>
-                <button
-                  onClick={(e) => handleDelete(email.id, e)}
-                  disabled={deletingId === email.id}
-                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                  title="Delete email"
-                >
-                  <Trash2 className="size-4" />
-                </button>
-              </div>
-            </div>
-            
-            <p className="text-sm text-slate-900 mb-2 truncate">{email.subject}</p>
-            
-            <div className="flex items-center justify-between">
-              <span className={`text-xs px-2 py-1 rounded-full ${statusColors[email.status]}`}>
-                {email.status}
-              </span>
-            </div>
-          </div>
-          ))
-        )}
+        {renderEmailList(activeTab)}
       </div>
     </div>
   );
